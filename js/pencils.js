@@ -55,7 +55,6 @@ mousemove: function () {
           oae_path();
           editmode = 'ac';
         } else {
-          console.log("a");
           focusprevstate = '.';
           isfirstcellchange = false;
           celleraser = false;
@@ -356,7 +355,6 @@ drawcore: function (cx,cy,n,targetcontext,colorin){
   // 線幅補正
   cx += pf;
   cy += pf;
-  //console.log(cx,cy,cx+h1[0],cy+h1[1],cx+h2[0],cy+h2[1]);
   targetcontext.moveTo( cx, cy );
   targetcontext.lineTo( cx + h1[0], cy + h1[1] );
   targetcontext.lineTo( cx + h2[0], cy + h2[1] );
