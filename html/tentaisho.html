@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width">
+<link rel="stylesheet" href="../css_omopaedit.css" type="text/css">
+<title>天体ショー</title>
+</head>
+<body>
+<noscript><div><b>このページはJavaScriptを使用しています。機能を使用するにはJavaScriptを有効にして下さい。</b></div></noscript>
+<div id="oae">
+<textarea id="oaeheader">tentaisho</textarea>
+<div id="oaecontents">
+<div id="oaetoolcontainer">
+<div id="oaetool">
+<a id="oaeclean">新規</a><!--
+--><a id="oaefileoutput">保存</a><!--
+--><a id="oaepngoutput">PNG</a><!--
+--><a id="oaeansclean">解答消去</a><!--
+--><form id="oaemodeform"><!--
+--><input type="radio" id="oaemodesz" class="oaemode" name="oaemode" value="sz" /><label for="oaemodesz">SZ</label><!--
+--><input type="radio" id="oaemodeqp" class="oaemode" name="oaemode" value="qp" checked /><label for="oaemodeqp">QP</label><!--
+--><input type="radio" id="oaemodeac" class="oaemode" name="oaemode" value="ac" /><label for="oaemodeac">AC</label><!--
+--><input type="radio" id="oaemodeaw" class="oaemode" name="oaemode" value="aw" /><label for="oaemodeaw">AW</label><!--
+--></form><!--
+--><input type="color" id="oaeanswerlinecolor" value="#444444" /><!--
+--><input type="color" id="oaeanswershadecolor" value="#ff8666" />
+<div id="oaedisplayoption">
+<input type="checkbox" id="oaeaview" checked /><label for="oaeaview">解答表示</label>
+<input type="checkbox" id="oaecursorview" /><label for="oaecursorview">カーソル表示</label>
+<input type="checkbox" id="oaetransparent" /><label for="oaetransparent">透過</label>
+</div>
+</div><!-- end oaetool -->
+</div><!-- end oaetoolcontainer -->
+<div id="oaeboardscroller">
+<div id="oaeboard"><!--
+--><canvas id="canvasoaehist" width="1" height="30"></canvas><!--
+--><canvas id="canvasoaebg" width="1" height="30"></canvas><!--
+--><canvas id="canvasoaegd" width="1" height="30"></canvas><!--
+--><canvas id="canvasoaemn" width="1" height="30"></canvas><!--
+--><canvas id="canvasoaefg" width="1" height="30"></canvas><!--
+--><canvas id="canvasoaeov" width="1" height="30"></canvas><!--
+--></div>
+</div><!-- end oaescroller -->
+<div>
+</div>
+</div><!-- end oaecontents -->
+<div id="oaeconsolearea">
+<textarea id="oaeconsolein" cols=41 rows=2>check</textarea>
+<a id="oaeeval">実行</a>
+<a id="oaeconsoleclean">クリア</a>
+<div id="oaeconsoleout"></div>
+</div>
+</div><!-- end oae -->
+<a href="../index.html">上へ</a> |
+<a href="../doc/manual.html">操作マニュアル</a>
+<!-- -->
+<script type="text/javascript" src="../js/omopaedit.js"></script>
+<script type="text/javascript" src="../js/tentaisho.js"></script>
+</body>
+<!-- last: 2019, Mar. 19 -->
+</html>

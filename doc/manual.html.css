@@ -1,0 +1,194 @@
+.RDLbody{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 10px 5px;
+padding: 0px 5px;
+font-size: 140%;
+word-wrap:break-word;
+white-space:pre-wrap;
+font-family:Consolas, 'Lucida Console', 'Courier New',Courier, Monaco, monospace;
+}
+.RDLtitle{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 0px 5px;
+padding: 0px 5px;
+text-align: center; 
+font-size: 140%; 
+}
+.RDLauthor{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 0px 5px;
+padding: 0px 5px;
+text-align: right; 
+}
+.RDLdate{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 0px 5px;
+padding: 0px 5px;
+text-align: right; 
+}
+.RDLH{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 5px 0px;
+padding: 5px 5px;
+border: 1px solid #000000;
+}
+.RDLC{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 5px 40px;
+padding: 5px 5px;
+border: 1px solid #000000;
+}
+.RDLCH{ 
+color: #000000;
+background-color: #E6E6E6;
+margin: 5px 0px;
+padding: 5px 5px;
+border: 1px solid #000000;
+cursor:pointer; 
+}
+.RDLCC{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 5px 40px;
+padding: 5px 5px;
+font-size: 80%;
+}
+.RDLSH{ 
+color: #000000;
+background-color: #E6E6E6;
+margin: 5px 0px;
+padding: 5px 5px;
+border: 1px solid #000000;
+cursor:pointer; 
+}
+.RDLSC{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 5px 40px;
+padding: 5px 5px;
+font-size: 80%;
+}
+.RDLUH{ 
+color: #000000;
+background-color: #E6E6E6;
+margin: 5px 0px;
+padding: 5px 5px;
+border: 1px solid #000000;
+cursor:pointer; 
+}
+.RDLUC{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 5px 40px;
+padding: 5px 5px;
+border: 1px solid #000000;
+font-size: 80%;
+}
+.RDLBH{ 
+color: #000000;
+background-color: #E6E6E6;
+margin: 5px 0px;
+padding: 5px 5px;
+border: 1px solid #000000;
+cursor:pointer; 
+}
+.RDLBC{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 5px 40px;
+padding: 5px 5px;
+border: 1px solid #000000;
+font-size: 80%;
+}
+.RDLIH{ 
+color: #000000;
+background-color: #E6E6E6;
+margin: 5px 0px;
+padding: 5px 5px;
+border: 1px solid #000000;
+}
+.RDLIC{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 5px 40px;
+padding: 5px 5px;
+border: 1px solid #000000;
+}
+.RDLLH{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 5px 0px;
+padding: 5px 5px;
+}
+.RDLLC{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 5px 40px;
+padding: 5px 5px;
+}
+.RDLTH{ 
+color: #000000;
+background-color: #E6E6E6;
+margin: 5px 0px;
+padding: 5px 5px;
+border: 1px solid #000000;
+}
+.RDLTC{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 5px 40px;
+padding: 5px 5px;
+border: 1px solid #000000;
+}
+.RDLPH{ 
+color: #000000;
+margin: 5px 0px;
+padding: 5px 0px;
+}
+.RDLPC{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 5px 40px;
+padding: 5px 5px;
+border: 1px solid #000000;
+}
+.RDLQH{ 
+color: #000000;
+background-color: #F0F0F0;
+margin: 5px 40px;
+padding: 5px 5px;
+border: 1px solid #000000;
+}
+.RDLQC{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 5px 40px;
+padding: 5px 5px;
+border: 1px solid #000000;
+}
+.RDLDH{ 
+color: #000000;
+background-color: #F0F0F0;
+margin: 5px 40px;
+padding: 5px 5px;
+border: 1px solid #D2D2D2;
+}
+.RDLDC{ 
+color: #000000;
+background-color: #FFFFFF;
+margin: 5px 40px;
+padding: 5px 5px;
+border: 1px solid #000000;
+}
+.RDLfB{ font-weight: bold; }
+.RDLfI{ font-style: italic; }
+.RDLfU{ text-decoration: underline; }
+.RDLfR{  }
+.RDLfC{ color: transparent; }
+.RDLfT{ font-family: Consolas, 'Lucida Console', 'Courier New', Courier, Monaco, monospace; }
