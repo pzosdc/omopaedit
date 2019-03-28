@@ -30,14 +30,20 @@ mousemove: function () {
   } else if( editmode === 'ac' ){
     if( button === buttonid.left ){
       // left drag -> arrow
-      if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ) return false;
-      let relx = dragpath[dragpath.length-1][0] - dragpath[0][0];
-      let rely = dragpath[dragpath.length-1][1] - dragpath[0][1];
-      pencils.dragarrow(dragpath[0][0],dragpath[0][1],relx,rely);
+      if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ){
+        // 問題の芯からドラッグした場合は芯から出る線を描けるようにする
+        editmode = 'aw'; // 一時的にAWモードにする
+        oae_path();
+        editmode = 'ac';
+      } else {
+        let relx = dragpath[dragpath.length-1][0] - dragpath[0][0];
+        let rely = dragpath[dragpath.length-1][1] - dragpath[0][1];
+        pencils.dragarrow(dragpath[0][0],dragpath[0][1],relx,rely);
+      }
     } else if( button === buttonid.right ){
       if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ||
       adatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ){
-        // 芯から右ドラッグした場合は芯から出る線を描けるようにしてみる
+        // 芯から右ドラッグした場合は芯から出る線を描けるようにする
         editmode = 'aw'; // 一時的にAWモードにする
         oae_path();
         editmode = 'ac';
