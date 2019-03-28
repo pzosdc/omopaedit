@@ -1359,7 +1359,7 @@ function oae_path(){
 // oae_shade %{{{
 function oae_shade(){
   'use strict';
-  if( cellisoutside(focusx) ) return;
+  if( cellisoutside(focusx,focusy) ) return;
   let str = focusprevstate;
   if( isfirstcellchange ){
     celleraser = isshaded(str);
@@ -1384,7 +1384,7 @@ function oae_shade(){
 // oae_unshade %{{{
 function oae_unshade(){
   'use strict';
-  if( cellisoutside(focusx) ) return;
+  if( cellisoutside(focusx,focusy) ) return;
   let str = focusprevstate;
   if( isfirstcellchange ){
     celleraser = isunshaded(str);

@@ -1,8 +1,9 @@
 //JavaScript
 
-var pencilcoresize;
+//var pencilcoresize;
 
 var pencils = pencils || {
+coresize: 0.22,
 core: {
   up: '1',
   down: '2',
@@ -12,7 +13,7 @@ core: {
 // init %{{{
 init: function () {
   'use strict';
-  pencilcoresize = 0.22;
+  pencils.coresize = 0.22;
   return true;
 },
 //%}}}
@@ -32,9 +33,14 @@ mousemove: function () {
       // left drag -> arrow
       if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ){
         // 問題の芯からドラッグした場合は芯から出る線を描けるようにする
-        editmode = 'aw'; // 一時的にAWモードにする
-        oae_path();
-        editmode = 'ac';
+        if( pencils.dragfromcoreisline() ){
+          editmode = 'aw'; // 一時的にAWモードにする
+          oae_path();
+          editmode = 'ac';
+        } else {
+          oae_shade();
+          pencils.makejiku();
+        }
       } else {
         let relx = dragpath[dragpath.length-1][0] - dragpath[0][0];
         let rely = dragpath[dragpath.length-1][1] - dragpath[0][1];
@@ -44,9 +50,18 @@ mousemove: function () {
       if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ||
       adatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ){
         // 芯から右ドラッグした場合は芯から出る線を描けるようにする
-        editmode = 'aw'; // 一時的にAWモードにする
-        oae_path();
-        editmode = 'ac';
+        if( pencils.dragfromcoreisline() ){
+          editmode = 'aw'; // 一時的にAWモードにする
+          oae_path();
+          editmode = 'ac';
+        } else {
+          console.log("a");
+          focusprevstate = '.';
+          isfirstcellchange = false;
+          celleraser = false;
+          oae_shade();
+          pencils.makejiku();
+        }
       } else {
         // right drag -> shade
         oae_shade();
@@ -190,6 +205,77 @@ keydown: function (n) {
 },
 //%}}}
 
+// dragfromcoreisline %{{{
+dragfromcoreisline: function (){
+  // 芯から後ろ方向（軸方向）にドラッグした場合は軸の描画、そうでない場合は線の描画
+  'use strict';
+  let dx = dragpath[1][0] - dragpath[0][0];
+  let dy = dragpath[1][1] - dragpath[0][1];
+  let dir;
+  if( dx === 0 && dy === 1 ){
+    dir = pencils.core.down;
+  } else if( dx === 0 && dy === -1 ){
+    dir = pencils.core.up;
+  } else if( dx === -1 && dy === 0 ){
+    dir = pencils.core.right;
+  } else if( dx === 1 && dy === 0 ){
+    dir = pencils.core.left;
+  }
+  if( dir === qdatac[dragpath[0][0]][dragpath[0][1]] ){
+    return false;
+  } else if( dir === adatac[dragpath[0][0]][dragpath[0][1]] ){
+    return false;
+  }
+  return true;
+},
+//%}}}
+// makejiku %{{{
+makejiku: function (){
+  // 軸の拡張処理
+  'use strict';
+  let n = dragpath.length;
+  let dx = dragpath[n-1][0] - dragpath[n-2][0];
+  let dy = dragpath[n-1][1] - dragpath[n-2][1];
+  let cx = dragpath[n-1][0];
+  let cy = dragpath[n-1][1];
+  if( cellisoutside(cx,cy) ) return;
+  let dir;
+  if( dx === 0 && dy === 1 ){
+    dir = pencils.core.up;
+  } else if( dx === 0 && dy === -1 ){
+    dir = pencils.core.down;
+  } else if( dx === -1 && dy === 0 ){
+    dir = pencils.core.left;
+  } else if( dx === 1 && dy === 0 ){
+    dir = pencils.core.right;
+  } else {
+    return; // マウスカーソルの高速移動等で飛んだ場合はreturn
+  }
+  if( dir === pencils.core.up ){
+    adatav[cx-1][cy] = '1';
+    adatav[cx][cy] = '1';
+    adatah[cx][cy-1] = '0';
+    adatah[cx][cy] = '1';
+  } else if( dir === pencils.core.down ){
+    adatav[cx-1][cy] = '1';
+    adatav[cx][cy] = '1';
+    adatah[cx][cy-1] = '1';
+    adatah[cx][cy] = '0';
+  } else if( dir === pencils.core.left ){
+    adatav[cx-1][cy] = '1';
+    adatav[cx][cy] = '0';
+    adatah[cx][cy-1] = '1';
+    adatah[cx][cy] = '1';
+  } else if( dir === pencils.core.right ){
+    adatav[cx-1][cy] = '0';
+    adatav[cx][cy] = '1';
+    adatah[cx][cy-1] = '1';
+    adatah[cx][cy] = '1';
+  }
+  oaedrawadata();
+},
+//%}}}
+
 // shadetoggle %{{{
 shadetoggle: function (str) {
   'use strict';
@@ -264,7 +350,7 @@ drawcore: function (cx,cy,n,targetcontext,colorin){
   // したがって格子点の座標は整数で正確に得られる
   let h1 = [d1[0]*cellwidth*0.5,d1[1]*cellheight*0.5];
   let h2 = [d2[0]*cellwidth*0.5,d2[1]*cellheight*0.5];
-  let pcs = pencilcoresize;
+  let pcs = pencils.coresize;
   let p1 = [d1[0]*pcs*cellwidth,d1[1]*pcs*cellheight];
   let p2 = [d2[0]*pcs*cellwidth,d2[1]*pcs*cellheight];
   // 線幅補正
