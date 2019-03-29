@@ -38,8 +38,11 @@ mousemove: function () {
           oae_path();
           editmode = 'ac';
         } else {
-          oae_shade();
-          pencils.makejiku();
+          if( dragpath.length !== 1 ){
+            focusprevstate = adatac[dragpath[1][0]][dragpath[1][1]];
+            oae_shade();
+            pencils.makejiku();
+          }
         }
       } else {
         let relx = dragpath[dragpath.length-1][0] - dragpath[0][0];
@@ -55,11 +58,11 @@ mousemove: function () {
           oae_path();
           editmode = 'ac';
         } else {
-          focusprevstate = '.';
-          isfirstcellchange = false;
-          celleraser = false;
-          oae_shade();
-          pencils.makejiku();
+          if( dragpath.length !== 1 ){
+            focusprevstate = adatac[dragpath[1][0]][dragpath[1][1]];
+            oae_shade();
+            pencils.makejiku();
+          }
         }
       } else {
         // right drag -> shade
@@ -238,6 +241,14 @@ makejiku: function (){
   let cx = dragpath[n-1][0];
   let cy = dragpath[n-1][1];
   if( cellisoutside(cx,cy) ) return;
+  if( celleraser ){
+    if( isunshaded(adatac[cx-1][cy]) ) adatav[cx-1][cy] = '0';
+    if( isunshaded(adatac[cx+1][cy]) ) adatav[cx][cy] = '0';
+    if( isunshaded(adatac[cx][cy-1]) ) adatah[cx][cy-1] = '0';
+    if( isunshaded(adatac[cx][cy+1]) ) adatah[cx][cy] = '0';
+    oaedrawadata();
+    return;
+  }
   let dir;
   if( dx === 0 && dy === 1 ){    dir = pencils.core.up;
   } else if( dx === 0 && dy === -1 ){    dir = pencils.core.down;
