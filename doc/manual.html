@@ -45,7 +45,7 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLPH" id="RDLPH001" onclick="tog('RDLPC001')"><!--
+--><div class="RDLPH" id="RDLPH001"><!--
 --><span><!--
 -->タイトルを指定する<br/><!--
 -->テキスト保存や画像保存をする際にここで指定した名称が使用される<!--
@@ -67,7 +67,7 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLPH" id="RDLPH002" onclick="tog('RDLPC002')"><!--
+--><div class="RDLPH" id="RDLPH002"><!--
 --><span><!--
 -->ツールエリアは基本的な機能を提供する。<!--
 --></span><!--
@@ -276,7 +276,7 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLPH" id="RDLPH003" onclick="tog('RDLPC003')"><!--
+--><div class="RDLPH" id="RDLPH003"><!--
 --><span><!--
 -->履歴コントローラによって編集履歴を閲覧・操作する。<br/><!--
 -->縦軸上をクリックまたはドラッグで編集履歴を移動する<br/><!--
@@ -301,7 +301,7 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLPH" id="RDLPH004" onclick="tog('RDLPC004')"><!--
+--><div class="RDLPH" id="RDLPH004"><!--
 --><span><!--
 -->編集を行う盤面を表示する。解答表示がOFFの場合は問題のみの表示となることに注意する。<br/><!--
 -->画像ファイルをドラッグすることで背景画像に設定する。透過をONにした場合は盤面を半透明で描画する。<br/><!--
@@ -324,7 +324,7 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLPH" id="RDLPH005" onclick="tog('RDLPC005')"><!--
+--><div class="RDLPH" id="RDLPH005"><!--
 --><span><!--
 -->盤面下部のテキストエリアにコマンドを入力し実行ボタンを押すと実行する<br/><!--
 -->クリアボタンを押すとコマンド実行によって出力したメッセージを消去する<br/><!--
@@ -534,7 +534,7 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLPH" id="RDLPH006" onclick="tog('RDLPC006')"><!--
+--><div class="RDLPH" id="RDLPH006"><!--
 --><span><!--
 -->ここでは保存に使用するファイル形式を記述する。以下で与える仕様に従ったファイルであってもパズルとして許容される問題・解答とは限らない。フールプルーフを丁寧に行っていないため、保存によって生成されたものでないファイルに関しては対応を保証しない。<!--
 --></span><!--
@@ -542,7 +542,7 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLPH" id="RDLPH007" onclick="tog('RDLPC007')"><!--
+--><div class="RDLPH" id="RDLPH007"><!--
 --><span><!--
 -->ファイルは改行文字(\x0a)によってセパレートされたフィールドによって構成される。一行目にファイル形式を記述する。二行目にパズルタイプを記述する。三行目以降に盤面情報を記述する。盤面情報はさらに複数のフィールドに分けられる。後のバージョンでパズルに関するメタ情報を含むフィールド等を追加する可能性があるが、この仕様によって明示した範囲に関しては可能な限り後方互換性を保つ。実際の構成を下に示す。<!--
 --></span><!--
@@ -566,7 +566,7 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLPH" id="RDLPH008" onclick="tog('RDLPC008')"><!--
+--><div class="RDLPH" id="RDLPH008"><!--
 --><span><!--
 -->フィールド[x]、[y]は盤面サイズを表す整数値を十進数で記述する。各フィールドは対応する編集モードによって編集したデータを格納する。各フィールドのデータは半角スペース文字(\x20)と改行文字(\x0a)によってセパレートされたアスキー文字列の行列である。フィールドごとの記法は以下に与える。<br/><!--
 -->記述に際し、シングルクオート文字で囲った文字列は文字列そのまま、ダブルクオートで囲った文字列は正規表現を表している。ダブルクオート内部ではバックスラッシュで適宜エスケープを行う。<!--
@@ -627,7 +627,7 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLPH" id="RDLPH009" onclick="tog('RDLPC009')"><!--
+--><div class="RDLPH" id="RDLPH009"><!--
 --><span><!--
 -->[AW-v]は鉛直方向(y軸方向)の壁、[AW-h]は水平方向(x軸方向)の壁を記述する。道の場合は対応する壁を貫くデータを表す。<!--
 --></span><!--
@@ -724,7 +724,7 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLPH" id="RDLPH010" onclick="tog('RDLPC010')"><!--
+--><div class="RDLPH" id="RDLPH010"><!--
 --><span><!--
 -->基本的な文法に関してはペンシルズを参照せよ。<!--
 --></span><!--
@@ -871,7 +871,7 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLPH" id="RDLPH011" onclick="tog('RDLPC011')"><!--
+--><div class="RDLPH" id="RDLPH011"><!--
 --><span><!--
 -->基本的な文法に関してはペンシルズを参照せよ。<!--
 --></span><!--
@@ -1019,7 +1019,7 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLPH" id="RDLPH012" onclick="tog('RDLPC012')"><!--
+--><div class="RDLPH" id="RDLPH012"><!--
 --><span><!--
 -->基本的な文法に関してはペンシルズを参照せよ。<!--
 --></span><!--
@@ -1171,7 +1171,7 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLPH" id="RDLPH013" onclick="tog('RDLPC013')"><!--
+--><div class="RDLPH" id="RDLPH013"><!--
 --><span><!--
 -->基本的な文法に関してはペンシルズを参照せよ。<!--
 --></span><!--
