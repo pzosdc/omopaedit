@@ -239,37 +239,80 @@ makejiku: function (){
   let cy = dragpath[n-1][1];
   if( cellisoutside(cx,cy) ) return;
   let dir;
-  if( dx === 0 && dy === 1 ){
-    dir = pencils.core.up;
-  } else if( dx === 0 && dy === -1 ){
-    dir = pencils.core.down;
-  } else if( dx === -1 && dy === 0 ){
-    dir = pencils.core.left;
-  } else if( dx === 1 && dy === 0 ){
-    dir = pencils.core.right;
-  } else {
-    return; // マウスカーソルの高速移動等で飛んだ場合はreturn
+  if( dx === 0 && dy === 1 ){    dir = pencils.core.up;
+  } else if( dx === 0 && dy === -1 ){    dir = pencils.core.down;
+  } else if( dx === -1 && dy === 0 ){    dir = pencils.core.left;
+  } else if( dx === 1 && dy === 0 ){    dir = pencils.core.right;
+  } else {    return; // マウスカーソルの高速移動等で飛んだ場合はreturn
   }
   if( dir === pencils.core.up ){
-    adatav[cx-1][cy] = '1';
-    adatav[cx][cy] = '1';
+    if( isshaded(adatac[cx-1][cy]) && isshaded(adatac[cx][cy]) ){
+      adatav[cx-1][cy] = '0';
+    } else {
+      adatav[cx-1][cy] = '1';
+    }
+    if( isshaded(adatac[cx+1][cy]) && isshaded(adatac[cx][cy]) ){
+      adatav[cx][cy] = '0';
+    } else {
+      adatav[cx][cy] = '1';
+    }
     adatah[cx][cy-1] = '0';
-    adatah[cx][cy] = '1';
+    if( isshaded(adatac[cx][cy+1]) && isshaded(adatac[cx][cy]) ){
+      adatah[cx][cy] = '0';
+    } else {
+      adatah[cx][cy] = '1';
+    }
   } else if( dir === pencils.core.down ){
-    adatav[cx-1][cy] = '1';
-    adatav[cx][cy] = '1';
-    adatah[cx][cy-1] = '1';
+    if( isshaded(adatac[cx-1][cy]) && isshaded(adatac[cx][cy]) ){
+      adatav[cx-1][cy] = '0';
+    } else {
+      adatav[cx-1][cy] = '1';
+    }
+    if( isshaded(adatac[cx+1][cy]) && isshaded(adatac[cx][cy]) ){
+      adatav[cx][cy] = '0';
+    } else {
+      adatav[cx][cy] = '1';
+    }
+    if( isshaded(adatac[cx][cy-1]) && isshaded(adatac[cx][cy]) ){
+      adatah[cx][cy-1] = '0';
+    } else {
+      adatah[cx][cy-1] = '1';
+    }
     adatah[cx][cy] = '0';
   } else if( dir === pencils.core.left ){
-    adatav[cx-1][cy] = '1';
+    if( isshaded(adatac[cx-1][cy]) && isshaded(adatac[cx][cy]) ){
+      adatav[cx-1][cy] = '0';
+    } else {
+      adatav[cx-1][cy] = '1';
+    }
     adatav[cx][cy] = '0';
-    adatah[cx][cy-1] = '1';
-    adatah[cx][cy] = '1';
+    if( isshaded(adatac[cx][cy-1]) && isshaded(adatac[cx][cy]) ){
+      adatah[cx][cy-1] = '0';
+    } else {
+      adatah[cx][cy-1] = '1';
+    }
+    if( isshaded(adatac[cx][cy+1]) && isshaded(adatac[cx][cy]) ){
+      adatah[cx][cy] = '0';
+    } else {
+      adatah[cx][cy] = '1';
+    }
   } else if( dir === pencils.core.right ){
     adatav[cx-1][cy] = '0';
-    adatav[cx][cy] = '1';
-    adatah[cx][cy-1] = '1';
-    adatah[cx][cy] = '1';
+    if( isshaded(adatac[cx+1][cy]) && isshaded(adatac[cx][cy]) ){
+      adatav[cx][cy] = '0';
+    } else {
+      adatav[cx][cy] = '1';
+    }
+    if( isshaded(adatac[cx][cy-1]) && isshaded(adatac[cx][cy]) ){
+      adatah[cx][cy-1] = '0';
+    } else {
+      adatah[cx][cy-1] = '1';
+    }
+    if( isshaded(adatac[cx][cy+1]) && isshaded(adatac[cx][cy]) ){
+      adatah[cx][cy] = '0';
+    } else {
+      adatah[cx][cy] = '1';
+    }
   }
   oaedrawadata();
 },
