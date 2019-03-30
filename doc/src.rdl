@@ -1,11 +1,11 @@
 && Language    : RDL
 && Description : omopaedit manual
 && Maintainer  : pzdc
-&& Lastchange  : 2019, Mar. 29
+&& Lastchange  : 2019, Mar. 30
 
-&(; title  &|; omopaedit&;version&; 1.0 &;簡易マニュアル &);
+&(; title  &|; omopaedit &;簡易マニュアル &);
 &(; author &|; pzdc &);
-&(; date   &|; 2019,&;Mar.&;29 &);
+&(; date   &|; 2019,&;Mar.&;30 &);
 &maketitle;
 
 &(C;
