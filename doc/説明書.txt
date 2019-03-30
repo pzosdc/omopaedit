@@ -1,6 +1,6 @@
-Title  : omopaedit version 1.0 簡易マニュアル
+Title  : omopaedit version 1.1 簡易マニュアル
 Author : pzdc
-Date   : 2019, Mar. 29
+Date   : 2019, Mar. 30
 
 1.  画面の構成
     
