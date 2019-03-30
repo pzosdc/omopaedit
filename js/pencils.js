@@ -38,8 +38,7 @@ mousemove: function () {
           oae_path();
           editmode = 'ac';
         } else {
-          oae_shade();
-          pencils.makejiku();
+          pencils.jikushade();
         }
       } else {
         let relx = dragpath[dragpath.length-1][0] - dragpath[0][0];
@@ -55,11 +54,7 @@ mousemove: function () {
           oae_path();
           editmode = 'ac';
         } else {
-          focusprevstate = '.';
-          isfirstcellchange = false;
-          celleraser = false;
-          oae_shade();
-          pencils.makejiku();
+          pencils.jikushade();
         }
       } else {
         // right drag -> shade
@@ -228,6 +223,23 @@ dragfromcoreisline: function (){
   return true;
 },
 //%}}}
+// jikushade %{{{
+jikushade: function (){
+  'use strict';
+  if( dragpath.length === 2 ){
+    focusprevstate = adatac[dragpath[1][0]][dragpath[1][1]];
+    if( isshaded(focusprevstate) ){
+      celleraser = true;
+    } else {
+      celleraser = false;
+    }
+    isfirstcellchange = false;
+  }
+  pencils.makejiku();
+  oae_shade();
+  return;
+},
+//%}}}
 // makejiku %{{{
 makejiku: function (){
   // 軸の拡張処理
@@ -238,38 +250,90 @@ makejiku: function (){
   let cx = dragpath[n-1][0];
   let cy = dragpath[n-1][1];
   if( cellisoutside(cx,cy) ) return;
-  let dir;
-  if( dx === 0 && dy === 1 ){
-    dir = pencils.core.up;
-  } else if( dx === 0 && dy === -1 ){
-    dir = pencils.core.down;
-  } else if( dx === -1 && dy === 0 ){
-    dir = pencils.core.left;
-  } else if( dx === 1 && dy === 0 ){
-    dir = pencils.core.right;
-  } else {
-    return; // マウスカーソルの高速移動等で飛んだ場合はreturn
+  if( celleraser ){
+    if( ! isshaded(adatac[cx-1][cy]) ) adatav[cx-1][cy] = '0';
+    if( ! isshaded(adatac[cx+1][cy]) ) adatav[cx][cy] = '0';
+    if( ! isshaded(adatac[cx][cy-1]) ) adatah[cx][cy-1] = '0';
+    if( ! isshaded(adatac[cx][cy+1]) ) adatah[cx][cy] = '0';
+    oaedrawadata();
+    return;
   }
+  let dir;
+  if( dx === 0 && dy === 1 ){    dir = pencils.core.up;
+  } else if( dx === 0 && dy === -1 ){    dir = pencils.core.down;
+  } else if( dx === -1 && dy === 0 ){    dir = pencils.core.left;
+  } else if( dx === 1 && dy === 0 ){    dir = pencils.core.right;
+  } else {    return; // マウスカーソルの高速移動等で飛んだ場合はreturn
+  }
+  // ここのコードが少し汚いのでもう少し整理したい
   if( dir === pencils.core.up ){
-    adatav[cx-1][cy] = '1';
-    adatav[cx][cy] = '1';
+    if( isshaded(adatac[cx-1][cy]) && isshaded(adatac[cx][cy]) ){
+      adatav[cx-1][cy] = '0';
+    } else {
+      adatav[cx-1][cy] = '1';
+    }
+    if( isshaded(adatac[cx+1][cy]) && isshaded(adatac[cx][cy]) ){
+      adatav[cx][cy] = '0';
+    } else {
+      adatav[cx][cy] = '1';
+    }
     adatah[cx][cy-1] = '0';
-    adatah[cx][cy] = '1';
+    if( isshaded(adatac[cx][cy+1]) && isshaded(adatac[cx][cy]) ){
+      adatah[cx][cy] = '0';
+    } else {
+      adatah[cx][cy] = '1';
+    }
   } else if( dir === pencils.core.down ){
-    adatav[cx-1][cy] = '1';
-    adatav[cx][cy] = '1';
-    adatah[cx][cy-1] = '1';
+    if( isshaded(adatac[cx-1][cy]) && isshaded(adatac[cx][cy]) ){
+      adatav[cx-1][cy] = '0';
+    } else {
+      adatav[cx-1][cy] = '1';
+    }
+    if( isshaded(adatac[cx+1][cy]) && isshaded(adatac[cx][cy]) ){
+      adatav[cx][cy] = '0';
+    } else {
+      adatav[cx][cy] = '1';
+    }
+    if( isshaded(adatac[cx][cy-1]) && isshaded(adatac[cx][cy]) ){
+      adatah[cx][cy-1] = '0';
+    } else {
+      adatah[cx][cy-1] = '1';
+    }
     adatah[cx][cy] = '0';
   } else if( dir === pencils.core.left ){
-    adatav[cx-1][cy] = '1';
+    if( isshaded(adatac[cx-1][cy]) && isshaded(adatac[cx][cy]) ){
+      adatav[cx-1][cy] = '0';
+    } else {
+      adatav[cx-1][cy] = '1';
+    }
     adatav[cx][cy] = '0';
-    adatah[cx][cy-1] = '1';
-    adatah[cx][cy] = '1';
+    if( isshaded(adatac[cx][cy-1]) && isshaded(adatac[cx][cy]) ){
+      adatah[cx][cy-1] = '0';
+    } else {
+      adatah[cx][cy-1] = '1';
+    }
+    if( isshaded(adatac[cx][cy+1]) && isshaded(adatac[cx][cy]) ){
+      adatah[cx][cy] = '0';
+    } else {
+      adatah[cx][cy] = '1';
+    }
   } else if( dir === pencils.core.right ){
     adatav[cx-1][cy] = '0';
-    adatav[cx][cy] = '1';
-    adatah[cx][cy-1] = '1';
-    adatah[cx][cy] = '1';
+    if( isshaded(adatac[cx+1][cy]) && isshaded(adatac[cx][cy]) ){
+      adatav[cx][cy] = '0';
+    } else {
+      adatav[cx][cy] = '1';
+    }
+    if( isshaded(adatac[cx][cy-1]) && isshaded(adatac[cx][cy]) ){
+      adatah[cx][cy-1] = '0';
+    } else {
+      adatah[cx][cy-1] = '1';
+    }
+    if( isshaded(adatac[cx][cy+1]) && isshaded(adatac[cx][cy]) ){
+      adatah[cx][cy] = '0';
+    } else {
+      adatah[cx][cy] = '1';
+    }
   }
   oaedrawadata();
 },
