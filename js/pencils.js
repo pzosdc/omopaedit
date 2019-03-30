@@ -38,11 +38,7 @@ mousemove: function () {
           oae_path();
           editmode = 'ac';
         } else {
-          if( dragpath.length !== 1 ){
-            focusprevstate = adatac[dragpath[1][0]][dragpath[1][1]];
-            oae_shade();
-            pencils.makejiku();
-          }
+          pencils.jikushade();
         }
       } else {
         let relx = dragpath[dragpath.length-1][0] - dragpath[0][0];
@@ -58,11 +54,7 @@ mousemove: function () {
           oae_path();
           editmode = 'ac';
         } else {
-          if( dragpath.length !== 1 ){
-            focusprevstate = adatac[dragpath[1][0]][dragpath[1][1]];
-            oae_shade();
-            pencils.makejiku();
-          }
+          pencils.jikushade();
         }
       } else {
         // right drag -> shade
@@ -231,6 +223,23 @@ dragfromcoreisline: function (){
   return true;
 },
 //%}}}
+// jikushade %{{{
+jikushade: function (){
+  'use strict';
+  if( dragpath.length === 2 ){
+    focusprevstate = adatac[dragpath[1][0]][dragpath[1][1]];
+    if( isshaded(focusprevstate) ){
+      celleraser = true;
+    } else {
+      celleraser = false;
+    }
+    isfirstcellchange = false;
+  }
+  pencils.makejiku();
+  oae_shade();
+  return;
+},
+//%}}}
 // makejiku %{{{
 makejiku: function (){
   // 軸の拡張処理
@@ -242,10 +251,10 @@ makejiku: function (){
   let cy = dragpath[n-1][1];
   if( cellisoutside(cx,cy) ) return;
   if( celleraser ){
-    if( isunshaded(adatac[cx-1][cy]) ) adatav[cx-1][cy] = '0';
-    if( isunshaded(adatac[cx+1][cy]) ) adatav[cx][cy] = '0';
-    if( isunshaded(adatac[cx][cy-1]) ) adatah[cx][cy-1] = '0';
-    if( isunshaded(adatac[cx][cy+1]) ) adatah[cx][cy] = '0';
+    if( ! isshaded(adatac[cx-1][cy]) ) adatav[cx-1][cy] = '0';
+    if( ! isshaded(adatac[cx+1][cy]) ) adatav[cx][cy] = '0';
+    if( ! isshaded(adatac[cx][cy-1]) ) adatah[cx][cy-1] = '0';
+    if( ! isshaded(adatac[cx][cy+1]) ) adatah[cx][cy] = '0';
     oaedrawadata();
     return;
   }
@@ -256,6 +265,7 @@ makejiku: function (){
   } else if( dx === 1 && dy === 0 ){    dir = pencils.core.right;
   } else {    return; // マウスカーソルの高速移動等で飛んだ場合はreturn
   }
+  // ここのコードが少し汚いのでもう少し整理したい
   if( dir === pencils.core.up ){
     if( isshaded(adatac[cx-1][cy]) && isshaded(adatac[cx][cy]) ){
       adatav[cx-1][cy] = '0';
