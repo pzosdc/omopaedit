@@ -1,7 +1,5 @@
 //JavaScript
 
-//var pencilcoresize;
-
 var pencils = pencils || {
 coresize: 0.22,
 core: {
@@ -33,12 +31,12 @@ mousemove: function () {
       // left drag -> arrow
       if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ){
         // 問題の芯からドラッグした場合は芯から出る線を描けるようにする
-        if( pencils.dragfromcoreisline() ){
+        if( pencils.dragfromcoreisjiku() ){
+          pencils.jikushade();
+        } else {
           editmode = 'aw'; // 一時的にAWモードにする
           oae_path();
           editmode = 'ac';
-        } else {
-          pencils.jikushade();
         }
       } else {
         let relx = dragpath[dragpath.length-1][0] - dragpath[0][0];
@@ -49,12 +47,12 @@ mousemove: function () {
       if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ||
       adatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ){
         // 芯から右ドラッグした場合は芯から出る線を描けるようにする
-        if( pencils.dragfromcoreisline() ){
+        if( pencils.dragfromcoreisjiku() ){
+          pencils.jikushade();
+        } else {
           editmode = 'aw'; // 一時的にAWモードにする
           oae_path();
           editmode = 'ac';
-        } else {
-          pencils.jikushade();
         }
       } else {
         // right drag -> shade
@@ -199,8 +197,8 @@ keydown: function (n) {
 },
 //%}}}
 
-// dragfromcoreisline %{{{
-dragfromcoreisline: function (){
+// dragfromcoreisjiku %{{{
+dragfromcoreisjiku: function (){
   // 芯から後ろ方向（軸方向）にドラッグした場合は軸の描画、そうでない場合は線の描画
   'use strict';
   let dx = dragpath[1][0] - dragpath[0][0];
@@ -216,17 +214,18 @@ dragfromcoreisline: function (){
     dir = pencils.core.left;
   }
   if( dir === qdatac[dragpath[0][0]][dragpath[0][1]] ){
-    return false;
+    return true;
   } else if( dir === adatac[dragpath[0][0]][dragpath[0][1]] ){
-    return false;
+    return true;
   }
-  return true;
+  return false;
 },
 //%}}}
 // jikushade %{{{
 jikushade: function (){
   'use strict';
-  if( dragpath.length === 2 ){
+  let n = dragpath.length;
+  if( n === 2 ){
     focusprevstate = adatac[dragpath[1][0]][dragpath[1][1]];
     if( isshaded(focusprevstate) ){
       celleraser = true;
@@ -234,6 +233,14 @@ jikushade: function (){
       celleraser = false;
     }
     isfirstcellchange = false;
+  }
+  if( n >= 3 && dragpath[n-1][0] === dragpath[n-3][0] && dragpath[n-1][1] === dragpath[n-3][1] ){
+    let px = dragpath[n-2][0];
+    let py = dragpath[n-2][1];
+    dragpath.pop();
+    dragpath.pop();
+    pencils.retracejiku(px,py);
+    return;
   }
   pencils.makejiku();
   oae_shade();
@@ -245,10 +252,12 @@ makejiku: function (){
   // 軸の拡張処理
   'use strict';
   let n = dragpath.length;
-  let dx = dragpath[n-1][0] - dragpath[n-2][0];
-  let dy = dragpath[n-1][1] - dragpath[n-2][1];
-  let cx = dragpath[n-1][0];
+  let px = dragpath[n-2][0]; // p = previous
+  let py = dragpath[n-2][1];
+  let cx = dragpath[n-1][0]; // c = current
   let cy = dragpath[n-1][1];
+  let dx = cx - px;
+  let dy = cy - py;
   if( cellisoutside(cx,cy) ) return;
   if( celleraser ){
     if( ! isshaded(adatac[cx-1][cy]) ) adatav[cx-1][cy] = '0';
@@ -265,79 +274,81 @@ makejiku: function (){
   } else if( dx === 1 && dy === 0 ){    dir = pencils.core.right;
   } else {    return; // マウスカーソルの高速移動等で飛んだ場合はreturn
   }
-  // ここのコードが少し汚いのでもう少し整理したい
   if( dir === pencils.core.up ){
-    if( isshaded(adatac[cx-1][cy]) && isshaded(adatac[cx][cy]) ){
-      adatav[cx-1][cy] = '0';
-    } else {
-      adatav[cx-1][cy] = '1';
-    }
-    if( isshaded(adatac[cx+1][cy]) && isshaded(adatac[cx][cy]) ){
-      adatav[cx][cy] = '0';
-    } else {
-      adatav[cx][cy] = '1';
-    }
     adatah[cx][cy-1] = '0';
-    if( isshaded(adatac[cx][cy+1]) && isshaded(adatac[cx][cy]) ){
-      adatah[cx][cy] = '0';
-    } else {
-      adatah[cx][cy] = '1';
-    }
   } else if( dir === pencils.core.down ){
-    if( isshaded(adatac[cx-1][cy]) && isshaded(adatac[cx][cy]) ){
-      adatav[cx-1][cy] = '0';
-    } else {
-      adatav[cx-1][cy] = '1';
-    }
-    if( isshaded(adatac[cx+1][cy]) && isshaded(adatac[cx][cy]) ){
-      adatav[cx][cy] = '0';
-    } else {
-      adatav[cx][cy] = '1';
-    }
-    if( isshaded(adatac[cx][cy-1]) && isshaded(adatac[cx][cy]) ){
-      adatah[cx][cy-1] = '0';
-    } else {
-      adatah[cx][cy-1] = '1';
-    }
     adatah[cx][cy] = '0';
   } else if( dir === pencils.core.left ){
-    if( isshaded(adatac[cx-1][cy]) && isshaded(adatac[cx][cy]) ){
-      adatav[cx-1][cy] = '0';
-    } else {
-      adatav[cx-1][cy] = '1';
-    }
     adatav[cx][cy] = '0';
-    if( isshaded(adatac[cx][cy-1]) && isshaded(adatac[cx][cy]) ){
-      adatah[cx][cy-1] = '0';
-    } else {
-      adatah[cx][cy-1] = '1';
-    }
-    if( isshaded(adatac[cx][cy+1]) && isshaded(adatac[cx][cy]) ){
-      adatah[cx][cy] = '0';
-    } else {
-      adatah[cx][cy] = '1';
-    }
   } else if( dir === pencils.core.right ){
     adatav[cx-1][cy] = '0';
-    if( isshaded(adatac[cx+1][cy]) && isshaded(adatac[cx][cy]) ){
-      adatav[cx][cy] = '0';
-    } else {
-      adatav[cx][cy] = '1';
-    }
-    if( isshaded(adatac[cx][cy-1]) && isshaded(adatac[cx][cy]) ){
-      adatah[cx][cy-1] = '0';
-    } else {
+  }
+  // ここのコードが少し汚いのでもう少し整理したい
+  if( dir === pencils.core.up ){
+    if( ! isshaded(adatac[cx-1][cy  ]) || ! isshaded(adatac[cx][cy]) ) adatav[cx-1][cy] = '1';
+    if( ! isshaded(adatac[cx+1][cy  ]) || ! isshaded(adatac[cx][cy]) ) adatav[cx  ][cy] = '1';
+    if( ! isshaded(adatac[cx  ][cy+1]) || ! isshaded(adatac[cx][cy]) ) adatah[cx  ][cy] = '1';
+  } else if( dir === pencils.core.down ){
+    if( ! isshaded(adatac[cx-1][cy  ]) || ! isshaded(adatac[cx][cy]) ) adatav[cx-1][cy  ] = '1';
+    if( ! isshaded(adatac[cx+1][cy  ]) || ! isshaded(adatac[cx][cy]) ) adatav[cx  ][cy  ] = '1';
+    if( ! isshaded(adatac[cx  ][cy-1]) || ! isshaded(adatac[cx][cy]) ) adatah[cx  ][cy-1] = '1';
+  } else if( dir === pencils.core.left ){
+    if( ! isshaded(adatac[cx-1][cy  ]) || ! isshaded(adatac[cx][cy]) ) adatav[cx-1][cy  ] = '1';
+    if( ! isshaded(adatac[cx  ][cy-1]) || ! isshaded(adatac[cx][cy]) ) adatah[cx  ][cy-1] = '1';
+    if( ! isshaded(adatac[cx  ][cy+1]) || ! isshaded(adatac[cx][cy]) ) adatah[cx  ][cy  ] = '1';
+  } else if( dir === pencils.core.right ){
+    if( ! isshaded(adatac[cx+1][cy  ]) || ! isshaded(adatac[cx][cy]) ) adatav[cx][cy  ] = '1';
+    if( ! isshaded(adatac[cx  ][cy-1]) || ! isshaded(adatac[cx][cy]) ) adatah[cx][cy-1] = '1';
+    if( ! isshaded(adatac[cx  ][cy+1]) || ! isshaded(adatac[cx][cy]) ) adatah[cx][cy  ] = '1';
+  }
+  oaedrawadata();
+},
+//%}}}
+// retracejiku %{{{
+retracejiku: function (px,py){
+  // 軸描画で引き返しが発生した場合の軸短縮処理
+  'use strict';
+  let n = dragpath.length;
+  let cx = dragpath[n-1][0]; // c = current
+  let cy = dragpath[n-1][1];
+  let dx = cx - px;
+  let dy = cy - py;
+  adatac[px][py] = '.';
+  let dir;
+  if( dx === 0 && dy === 1 ){    dir = pencils.core.up;
+  } else if( dx === 0 && dy === -1 ){    dir = pencils.core.down;
+  } else if( dx === -1 && dy === 0 ){    dir = pencils.core.left;
+  } else if( dx === 1 && dy === 0 ){    dir = pencils.core.right;
+  } else {    return; // マウスカーソルの高速移動等で飛んだ場合はreturn
+  }
+  if( ! isshaded(adatac[px-1][py]) ) adatav[px-1][py] = '0';
+  if( ! isshaded(adatac[px+1][py]) ) adatav[px][py] = '0';
+  if( ! isshaded(adatac[px][py-1]) ) adatah[px][py-1] = '0';
+  if( ! isshaded(adatac[px][py+1]) ) adatah[px][py] = '0';
+  if( n !== 1 ){
+    if( dir === pencils.core.up ){
       adatah[cx][cy-1] = '1';
-    }
-    if( isshaded(adatac[cx][cy+1]) && isshaded(adatac[cx][cy]) ){
-      adatah[cx][cy] = '0';
-    } else {
+    } else if( dir === pencils.core.down ){
       adatah[cx][cy] = '1';
+    } else if( dir === pencils.core.left ){
+      adatav[cx][cy] = '1';
+    } else if( dir === pencils.core.right ){
+      adatav[cx-1][cy] = '1';
     }
   }
   oaedrawadata();
 },
 //%}}}
+// 軸のループ描画が発生した場合、操作ミスである可能性が高い
+// 曲り鉛筆は引き返し処理で取り消しがしやすいが、仕様上ループ描画は軸全体の取り消しが必要になり、厄介になる
+// ループ描画を防止する機能があっても良いかも
+
+// 既に描画されている軸の先端からドラッグで軸描画に移行するようにすると便利（ただしループを含まない正常な軸である必要がある）
+
+// 軸をすでに描画している場合で、芯の位置を後から微調整したい場合に面倒：鉛筆の「前方成長」機能の検討
+
+// 線描がも引き返し機能を実装した方が便利かも
+// ... ただし線描画はもともと軸描画よりお手軽だし、これくらいシンプルの方がわかりやすくて良いと考える
 
 // shadetoggle %{{{
 shadetoggle: function (str) {
