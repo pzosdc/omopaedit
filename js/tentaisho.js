@@ -8,6 +8,8 @@ mousemove: function (){
   } else if( editmode === 'ac' ){
     if( button === buttonid.left ){
       oae_leftclick();
+    } else if( button === buttonid.right ){
+      oae_rightclick();
     }
   } else if( editmode === 'aw' ){
     if( button === buttonid.left ){
@@ -52,6 +54,8 @@ rightclick: function (){
     }
     qdatap[focusx][focusy] = str;
     oaedrawqdata();
+  } else if( editmode === 'ac' ){
+    oae_unshade();
   }
 },
 //%}}}
@@ -65,6 +69,12 @@ keydown: function (){
 shadetoggle: function (str) {
   'use strict';
   return ( str === '.' ) ? '=' : '.';
+},
+//%}}}
+// unshadetoggle %{{{
+unshadetoggle: function (str) {
+  'use strict';
+  return ( str === '.' ) ? '-' : '.';
 },
 //%}}}
 

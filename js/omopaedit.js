@@ -1210,7 +1210,7 @@ function oae_unshadetoggle(str){
   } else if( puzzletype === 'doublechoco' ){
     return doublechoco.shadetoggle(str);
   } else if( puzzletype === 'tentaisho' ){
-    return tentaisho.shadetoggle(str);
+    return tentaisho.unshadetoggle(str);
   } else if( puzzletype === 'midloop' ){
   } else if( puzzletype === 'squlin' ){
     return squlin.unshadetoggle(str);
