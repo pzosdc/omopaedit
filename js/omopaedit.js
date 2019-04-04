@@ -3179,22 +3179,7 @@ function oae_incrementmode(){
 // oae_setcolor %{{{
 function oae_setcolor(){
   'use strict';
-  problemlinecolor = '#111111';
-  problemshadecolor = '#cccccc';
-  answerlinecolor = '#319431';
-  answershadecolor = '#31ff31';
-  if( document.getElementById('oaeproblemlinecolor') !== null ){
-    problemlinecolor = document.getElementById('oaeproblemlinecolor').value;
-  }
-  if( document.getElementById('oaeproblemshadecolor') !== null ){
-    problemshadecolor = document.getElementById('oaeproblemshadecolor').value;
-  }
-  if( document.getElementById('oaeanswerlinecolor') !== null ){
-    answerlinecolor = document.getElementById('oaeanswerlinecolor').value;
-  }
-  if( document.getElementById('oaeanswershadecolor') !== null ){
-    answershadecolor = document.getElementById('oaeanswershadecolor').value;
-  }
+  oaeinitcolor();
   oaerewriteall();
   return;
 }
