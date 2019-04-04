@@ -31,7 +31,7 @@ mousemove: function () {
       // left drag -> arrow
       if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ){
         // 問題の芯からドラッグした場合は芯から出る線を描けるようにする
-        if( pencils.dragfromcoreisjiku() ){
+        if( pencils.dragfromcoreisjiku() ){ // ドラッグの最初だけでなく常に判定することによって引き返しに対応
           pencils.jikushade();
         } else {
           editmode = 'aw'; // 一時的にAWモードにする
@@ -59,6 +59,7 @@ mousemove: function () {
         oae_shade();
       }
     }
+    oaedrawadata();
   } else if( editmode === 'aw' ){
     if( button === buttonid.left ){
       oae_wall();
@@ -264,7 +265,6 @@ makejiku: function (){
     if( ! isshaded(adatac[cx+1][cy]) ) adatav[cx][cy] = '0';
     if( ! isshaded(adatac[cx][cy-1]) ) adatah[cx][cy-1] = '0';
     if( ! isshaded(adatac[cx][cy+1]) ) adatah[cx][cy] = '0';
-    oaedrawadata();
     return;
   }
   let dir;
@@ -301,7 +301,6 @@ makejiku: function (){
     if( ! isshaded(adatac[cx  ][cy-1]) || ! isshaded(adatac[cx][cy]) ) adatah[cx][cy-1] = '1';
     if( ! isshaded(adatac[cx  ][cy+1]) || ! isshaded(adatac[cx][cy]) ) adatah[cx][cy  ] = '1';
   }
-  oaedrawadata();
 },
 //%}}}
 // retracejiku %{{{
@@ -336,18 +335,19 @@ retracejiku: function (px,py){
       adatav[cx-1][cy] = '1';
     }
   }
-  oaedrawadata();
 },
 //%}}}
 // 軸のループ描画が発生した場合、操作ミスである可能性が高い
-// 曲り鉛筆は引き返し処理で取り消しがしやすいが、仕様上ループ描画は軸全体の取り消しが必要になり、厄介になる
+// 曲り鉛筆は引き返し処理で取り消しがしやすいが、ループ描画はわかりづらい
 // ループ描画を防止する機能があっても良いかも
 
 // 既に描画されている軸の先端からドラッグで軸描画に移行するようにすると便利（ただしループを含まない正常な軸である必要がある）
+// 線が軸に突入する時に背景色や壁も変更したほうが使いやすいかも(ただ正規ルールの場合はむしろ突入を禁止した方が良いかも)
+// 軸の取り消し操作はワンクリックで出来て、そのまま直接ドラッグで新しい軸が描画できるようにしても良いかも(TheWitnessみたく)
 
 // 軸をすでに描画している場合で、芯の位置を後から微調整したい場合に面倒：鉛筆の「前方成長」機能の検討
 
-// 線描がも引き返し機能を実装した方が便利かも
+// 線描画も引き返し機能を実装した方が便利かも
 // ... ただし線描画はもともと軸描画よりお手軽だし、これくらいシンプルの方がわかりやすくて良いと考える
 
 // shadetoggle %{{{
