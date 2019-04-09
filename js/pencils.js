@@ -226,7 +226,18 @@ dragfromcoreisjiku: function (){
 jikushade: function (){
   'use strict';
   let n = dragpath.length;
+  if( n === 1 ) return;
+  let px = dragpath[n-2][0];
+  let py = dragpath[n-2][1];
+  let cx = dragpath[n-1][0];
+  let cy = dragpath[n-1][1];
   if( n === 2 ){
+    if( qdatac[cx][cy].match(/[1-4]/) !== null 
+    || adatac[cx][cy].match(/[1-4]/) !== null ){
+      // 芯の後ろに芯がある場合にドラッグをキャンセルする機能
+      oae_initdrag();
+      return;
+    }
     focusprevstate = adatac[dragpath[1][0]][dragpath[1][1]];
     if( isshaded(focusprevstate) ){
       celleraser = true;
@@ -236,12 +247,22 @@ jikushade: function (){
     isfirstcellchange = false;
   }
   if( n >= 3 && dragpath[n-1][0] === dragpath[n-3][0] && dragpath[n-1][1] === dragpath[n-3][1] ){
-    let px = dragpath[n-2][0];
-    let py = dragpath[n-2][1];
     dragpath.pop();
     dragpath.pop();
     pencils.retracejiku(px,py);
     return;
+  }
+  if( ! celleraser ){
+    if( qdatac[cx][cy].match(/[1-4]/) !== null 
+    || adatac[cx][cy].match(/[1-4]/) !== null
+    || isshaded(adatac[cx][cy]) 
+    || cellisoutside(cx,cy) 
+    || Math.pow(cx-px,2) + Math.pow(cy-py,2) !== 1 ){
+      // 既に芯や軸があるセルへのドラッグは無効
+      // 盤面の外やカーソルジャンプも無効
+      dragpath.pop();
+      return;
+    }
   }
   pencils.makejiku();
   oae_shade();
@@ -272,7 +293,7 @@ makejiku: function (){
   } else if( dx === 0 && dy === -1 ){    dir = pencils.core.down;
   } else if( dx === -1 && dy === 0 ){    dir = pencils.core.left;
   } else if( dx === 1 && dy === 0 ){    dir = pencils.core.right;
-  } else {    return; // マウスカーソルの高速移動等で飛んだ場合はreturn
+  } else { return; // マウスカーソルの高速移動等で飛んだ場合はreturn
   }
   if( dir === pencils.core.up ){
     adatah[cx][cy-1] = '0';
@@ -337,10 +358,6 @@ retracejiku: function (px,py){
   }
 },
 //%}}}
-// 軸のループ描画が発生した場合、操作ミスである可能性が高い
-// 曲り鉛筆は引き返し処理で取り消しがしやすいが、ループ描画はわかりづらい
-// ループ描画を防止する機能があっても良いかも
-
 // 既に描画されている軸の先端からドラッグで軸描画に移行するようにすると便利（ただしループを含まない正常な軸である必要がある）
 // 線が軸に突入する時に背景色や壁も変更したほうが使いやすいかも(ただ正規ルールの場合はむしろ突入を禁止した方が良いかも)
 // 軸の取り消し操作はワンクリックで出来て、そのまま直接ドラッグで新しい軸が描画できるようにしても良いかも(TheWitnessみたく)
