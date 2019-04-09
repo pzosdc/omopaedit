@@ -237,8 +237,8 @@ jikushade: function (){
   let cx = dragpath[n-1][0];
   let cy = dragpath[n-1][1];
   if( n === 2 ){
-    if( qdatac[cx][cy].match(/[1-4]/) !== null 
-    || adatac[cx][cy].match(/[1-4]/) !== null ){
+    if( qdatac[cx][cy].match(/[1-4]/) !== null ||
+    adatac[cx][cy].match(/[1-4]/) !== null ){
       // 芯の後ろに芯がある場合にドラッグをキャンセルする機能
       oae_initdrag();
       return;
@@ -258,11 +258,11 @@ jikushade: function (){
     return;
   }
   if( ! celleraser ){
-    if( qdatac[cx][cy].match(/[1-4]/) !== null 
-    || adatac[cx][cy].match(/[1-4]/) !== null
-    || isshaded(adatac[cx][cy]) 
-    || cellisoutside(cx,cy) 
-    || Math.pow(cx-px,2) + Math.pow(cy-py,2) !== 1 ){
+    if( qdatac[cx][cy].match(/[1-4]/) !== null ||
+    adatac[cx][cy].match(/[1-4]/) !== null ||
+    isshaded(adatac[cx][cy]) ||
+    cellisoutside(cx,cy) ||
+    Math.pow(cx-px,2) + Math.pow(cy-py,2) !== 1 ){
       // 既に芯や軸があるセルへのドラッグは無効
       // 盤面の外やカーソルジャンプも無効
       dragpath.pop();
@@ -401,8 +401,8 @@ reconfigurejiku: function (x,y){
     let cx = cp[0][0];
     let cy = cp[0][1];
     if( i !== 0 ){
-      if( qdatac[cx][cy].match(/[1-4]/) !== null
-      || adatac[cx][cy].match(/[1-4]/) !== null ){
+      if( qdatac[cx][cy].match(/[1-4]/) !== null ||
+      adatac[cx][cy].match(/[1-4]/) !== null ){
         break;
       }
       let wallnum = 0;
