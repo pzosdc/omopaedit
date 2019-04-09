@@ -1,7 +1,5 @@
 //JavaScript
 
-//var pencilcoresize;
-
 var pencils = pencils || {
 coresize: 0.22,
 core: {
@@ -33,11 +31,16 @@ mousemove: function () {
       // left drag -> arrow
       if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ){
         // 問題の芯からドラッグした場合は芯から出る線を描けるようにする
-        if( pencils.dragfromcoreisline() ){
+        if( pencils.dragfromcoreisjiku() ){ // ドラッグの最初だけでなく常に判定することによって引き返しに対応
+          pencils.jikushade();
+        } else {
           editmode = 'aw'; // 一時的にAWモードにする
           oae_path();
           editmode = 'ac';
-        } else {
+        }
+      } else if( pencils.isinjiku(dragpath[0][0],dragpath[0][1]) ){
+        if( pencils.isatjikuend(dragpath[0][0],dragpath[0][1]) ){
+          pencils.reconfigurejiku(dragpath[0][0],dragpath[0][1]);
           pencils.jikushade();
         }
       } else {
@@ -49,18 +52,19 @@ mousemove: function () {
       if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ||
       adatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ){
         // 芯から右ドラッグした場合は芯から出る線を描けるようにする
-        if( pencils.dragfromcoreisline() ){
+        if( pencils.dragfromcoreisjiku() ){
+          pencils.jikushade();
+        } else {
           editmode = 'aw'; // 一時的にAWモードにする
           oae_path();
           editmode = 'ac';
-        } else {
-          pencils.jikushade();
         }
       } else {
         // right drag -> shade
         oae_shade();
       }
     }
+    oaedrawadata();
   } else if( editmode === 'aw' ){
     if( button === buttonid.left ){
       oae_wall();
@@ -199,8 +203,8 @@ keydown: function (n) {
 },
 //%}}}
 
-// dragfromcoreisline %{{{
-dragfromcoreisline: function (){
+// dragfromcoreisjiku %{{{
+dragfromcoreisjiku: function (){
   // 芯から後ろ方向（軸方向）にドラッグした場合は軸の描画、そうでない場合は線の描画
   'use strict';
   let dx = dragpath[1][0] - dragpath[0][0];
@@ -216,17 +220,29 @@ dragfromcoreisline: function (){
     dir = pencils.core.left;
   }
   if( dir === qdatac[dragpath[0][0]][dragpath[0][1]] ){
-    return false;
+    return true;
   } else if( dir === adatac[dragpath[0][0]][dragpath[0][1]] ){
-    return false;
+    return true;
   }
-  return true;
+  return false;
 },
 //%}}}
 // jikushade %{{{
 jikushade: function (){
   'use strict';
-  if( dragpath.length === 2 ){
+  let n = dragpath.length;
+  if( n === 1 ) return;
+  let px = dragpath[n-2][0];
+  let py = dragpath[n-2][1];
+  let cx = dragpath[n-1][0];
+  let cy = dragpath[n-1][1];
+  if( n === 2 ){
+    if( qdatac[cx][cy].match(/[1-4]/) !== null ||
+    adatac[cx][cy].match(/[1-4]/) !== null ){
+      // 芯の後ろに芯がある場合にドラッグをキャンセルする機能
+      oae_initdrag();
+      return;
+    }
     focusprevstate = adatac[dragpath[1][0]][dragpath[1][1]];
     if( isshaded(focusprevstate) ){
       celleraser = true;
@@ -234,6 +250,24 @@ jikushade: function (){
       celleraser = false;
     }
     isfirstcellchange = false;
+  }
+  if( n >= 3 && dragpath[n-1][0] === dragpath[n-3][0] && dragpath[n-1][1] === dragpath[n-3][1] ){
+    dragpath.pop();
+    dragpath.pop();
+    pencils.retracejiku(px,py);
+    return;
+  }
+  if( ! celleraser ){
+    if( qdatac[cx][cy].match(/[1-4]/) !== null ||
+    adatac[cx][cy].match(/[1-4]/) !== null ||
+    isshaded(adatac[cx][cy]) ||
+    cellisoutside(cx,cy) ||
+    Math.pow(cx-px,2) + Math.pow(cy-py,2) !== 1 ){
+      // 既に芯や軸があるセルへのドラッグは無効
+      // 盤面の外やカーソルジャンプも無効
+      dragpath.pop();
+      return;
+    }
   }
   pencils.makejiku();
   oae_shade();
@@ -245,17 +279,18 @@ makejiku: function (){
   // 軸の拡張処理
   'use strict';
   let n = dragpath.length;
-  let dx = dragpath[n-1][0] - dragpath[n-2][0];
-  let dy = dragpath[n-1][1] - dragpath[n-2][1];
-  let cx = dragpath[n-1][0];
+  let px = dragpath[n-2][0]; // p = previous
+  let py = dragpath[n-2][1];
+  let cx = dragpath[n-1][0]; // c = current
   let cy = dragpath[n-1][1];
+  let dx = cx - px;
+  let dy = cy - py;
   if( cellisoutside(cx,cy) ) return;
   if( celleraser ){
     if( ! isshaded(adatac[cx-1][cy]) ) adatav[cx-1][cy] = '0';
     if( ! isshaded(adatac[cx+1][cy]) ) adatav[cx][cy] = '0';
     if( ! isshaded(adatac[cx][cy-1]) ) adatah[cx][cy-1] = '0';
     if( ! isshaded(adatac[cx][cy+1]) ) adatah[cx][cy] = '0';
-    oaedrawadata();
     return;
   }
   let dir;
@@ -263,81 +298,146 @@ makejiku: function (){
   } else if( dx === 0 && dy === -1 ){    dir = pencils.core.down;
   } else if( dx === -1 && dy === 0 ){    dir = pencils.core.left;
   } else if( dx === 1 && dy === 0 ){    dir = pencils.core.right;
-  } else {    return; // マウスカーソルの高速移動等で飛んだ場合はreturn
+  } else { return; // マウスカーソルの高速移動等で飛んだ場合はreturn
+  }
+  if( dir === pencils.core.up ){
+    adatah[cx][cy-1] = '0';
+  } else if( dir === pencils.core.down ){
+    adatah[cx][cy] = '0';
+  } else if( dir === pencils.core.left ){
+    adatav[cx][cy] = '0';
+  } else if( dir === pencils.core.right ){
+    adatav[cx-1][cy] = '0';
   }
   // ここのコードが少し汚いのでもう少し整理したい
   if( dir === pencils.core.up ){
-    if( isshaded(adatac[cx-1][cy]) && isshaded(adatac[cx][cy]) ){
-      adatav[cx-1][cy] = '0';
-    } else {
-      adatav[cx-1][cy] = '1';
-    }
-    if( isshaded(adatac[cx+1][cy]) && isshaded(adatac[cx][cy]) ){
-      adatav[cx][cy] = '0';
-    } else {
-      adatav[cx][cy] = '1';
-    }
-    adatah[cx][cy-1] = '0';
-    if( isshaded(adatac[cx][cy+1]) && isshaded(adatac[cx][cy]) ){
-      adatah[cx][cy] = '0';
-    } else {
-      adatah[cx][cy] = '1';
-    }
+    if( ! isshaded(adatac[cx-1][cy  ]) || ! isshaded(adatac[cx][cy]) ) adatav[cx-1][cy] = '1';
+    if( ! isshaded(adatac[cx+1][cy  ]) || ! isshaded(adatac[cx][cy]) ) adatav[cx  ][cy] = '1';
+    if( ! isshaded(adatac[cx  ][cy+1]) || ! isshaded(adatac[cx][cy]) ) adatah[cx  ][cy] = '1';
   } else if( dir === pencils.core.down ){
-    if( isshaded(adatac[cx-1][cy]) && isshaded(adatac[cx][cy]) ){
-      adatav[cx-1][cy] = '0';
-    } else {
-      adatav[cx-1][cy] = '1';
-    }
-    if( isshaded(adatac[cx+1][cy]) && isshaded(adatac[cx][cy]) ){
-      adatav[cx][cy] = '0';
-    } else {
-      adatav[cx][cy] = '1';
-    }
-    if( isshaded(adatac[cx][cy-1]) && isshaded(adatac[cx][cy]) ){
-      adatah[cx][cy-1] = '0';
-    } else {
-      adatah[cx][cy-1] = '1';
-    }
-    adatah[cx][cy] = '0';
+    if( ! isshaded(adatac[cx-1][cy  ]) || ! isshaded(adatac[cx][cy]) ) adatav[cx-1][cy  ] = '1';
+    if( ! isshaded(adatac[cx+1][cy  ]) || ! isshaded(adatac[cx][cy]) ) adatav[cx  ][cy  ] = '1';
+    if( ! isshaded(adatac[cx  ][cy-1]) || ! isshaded(adatac[cx][cy]) ) adatah[cx  ][cy-1] = '1';
   } else if( dir === pencils.core.left ){
-    if( isshaded(adatac[cx-1][cy]) && isshaded(adatac[cx][cy]) ){
-      adatav[cx-1][cy] = '0';
-    } else {
-      adatav[cx-1][cy] = '1';
-    }
-    adatav[cx][cy] = '0';
-    if( isshaded(adatac[cx][cy-1]) && isshaded(adatac[cx][cy]) ){
-      adatah[cx][cy-1] = '0';
-    } else {
-      adatah[cx][cy-1] = '1';
-    }
-    if( isshaded(adatac[cx][cy+1]) && isshaded(adatac[cx][cy]) ){
-      adatah[cx][cy] = '0';
-    } else {
-      adatah[cx][cy] = '1';
-    }
+    if( ! isshaded(adatac[cx-1][cy  ]) || ! isshaded(adatac[cx][cy]) ) adatav[cx-1][cy  ] = '1';
+    if( ! isshaded(adatac[cx  ][cy-1]) || ! isshaded(adatac[cx][cy]) ) adatah[cx  ][cy-1] = '1';
+    if( ! isshaded(adatac[cx  ][cy+1]) || ! isshaded(adatac[cx][cy]) ) adatah[cx  ][cy  ] = '1';
   } else if( dir === pencils.core.right ){
-    adatav[cx-1][cy] = '0';
-    if( isshaded(adatac[cx+1][cy]) && isshaded(adatac[cx][cy]) ){
-      adatav[cx][cy] = '0';
-    } else {
-      adatav[cx][cy] = '1';
-    }
-    if( isshaded(adatac[cx][cy-1]) && isshaded(adatac[cx][cy]) ){
-      adatah[cx][cy-1] = '0';
-    } else {
-      adatah[cx][cy-1] = '1';
-    }
-    if( isshaded(adatac[cx][cy+1]) && isshaded(adatac[cx][cy]) ){
-      adatah[cx][cy] = '0';
-    } else {
-      adatah[cx][cy] = '1';
-    }
+    if( ! isshaded(adatac[cx+1][cy  ]) || ! isshaded(adatac[cx][cy]) ) adatav[cx][cy  ] = '1';
+    if( ! isshaded(adatac[cx  ][cy-1]) || ! isshaded(adatac[cx][cy]) ) adatah[cx][cy-1] = '1';
+    if( ! isshaded(adatac[cx  ][cy+1]) || ! isshaded(adatac[cx][cy]) ) adatah[cx][cy  ] = '1';
   }
-  oaedrawadata();
 },
 //%}}}
+// retracejiku %{{{
+retracejiku: function (px,py){
+  // 軸描画で引き返しが発生した場合の軸短縮処理
+  'use strict';
+  let n = dragpath.length;
+  let cx = dragpath[n-1][0]; // c = current
+  let cy = dragpath[n-1][1];
+  let dx = cx - px;
+  let dy = cy - py;
+  adatac[px][py] = '.';
+  let dir;
+  if( dx === 0 && dy === 1 ){    dir = pencils.core.up;
+  } else if( dx === 0 && dy === -1 ){    dir = pencils.core.down;
+  } else if( dx === -1 && dy === 0 ){    dir = pencils.core.left;
+  } else if( dx === 1 && dy === 0 ){    dir = pencils.core.right;
+  } else {    return; // マウスカーソルの高速移動等で飛んだ場合はreturn
+  }
+  if( ! isshaded(adatac[px-1][py]) ) adatav[px-1][py] = '0';
+  if( ! isshaded(adatac[px+1][py]) ) adatav[px][py] = '0';
+  if( ! isshaded(adatac[px][py-1]) ) adatah[px][py-1] = '0';
+  if( ! isshaded(adatac[px][py+1]) ) adatah[px][py] = '0';
+  if( n !== 1 ){
+    if( dir === pencils.core.up ){
+      adatah[cx][cy-1] = '1';
+    } else if( dir === pencils.core.down ){
+      adatah[cx][cy] = '1';
+    } else if( dir === pencils.core.left ){
+      adatav[cx][cy] = '1';
+    } else if( dir === pencils.core.right ){
+      adatav[cx-1][cy] = '1';
+    }
+  }
+},
+//%}}}
+// isinjiku %{{{
+isinjiku: function (cx,cy){
+  'use strict';
+  if( isshaded(adatac[cx][cy]) ) return true;
+  return false;
+},
+//%}}}
+// isatjikuend %{{{
+isatjikuend: function (cx,cy){
+  'use strict';
+  // injikuは前提とする
+  let wallnum = 0;
+  if( adatav[cx-1][cy  ] === '1' ) wallnum += 1;
+  if( adatav[cx  ][cy  ] === '1' ) wallnum += 1;
+  if( adatah[cx  ][cy-1] === '1' ) wallnum += 1;
+  if( adatah[cx  ][cy  ] === '1' ) wallnum += 1;
+  if( wallnum === 3 ) return true;
+  return false;
+},
+//%}}}
+// reconfigurejiku %{{{
+reconfigurejiku: function (x,y){
+  'use strict';
+  // 軸の先端がクリックされた場合に芯から先端までのドラッグパスを復元する
+  // 軸の先端（壁が３つ）から、壁が２つのマスをたどっていく場合、ループになる心配はない
+  // ここでは軸に色が塗られているかどうかではなく壁ベースに判断していくことにする
+  let cp = [];
+  cp.isinarr = function(ix,iy){
+    for( let i = 0; i < this.length; i ++ ){
+      if( this[i][0] === ix && this[i][1] === iy ) return true;
+    }
+    return false;
+  };
+  cp.unshift([x,y]);
+  for( let i = 0; i < ndivx*ndivy; i ++ ){
+    let cx = cp[0][0];
+    let cy = cp[0][1];
+    if( i !== 0 ){
+      if( qdatac[cx][cy].match(/[1-4]/) !== null ||
+      adatac[cx][cy].match(/[1-4]/) !== null ){
+        break;
+      }
+      let wallnum = 0;
+      if( adatav[cx-1][cy  ] === '1' ) wallnum ++;
+      if( adatav[cx  ][cy  ] === '1' ) wallnum ++;
+      if( adatah[cx  ][cy-1] === '1' ) wallnum ++;
+      if( adatah[cx  ][cy  ] === '1' ) wallnum ++;
+      if( wallnum !== 2 ){
+        // fail return
+        return false;
+      }
+    }
+    if( adatav[cx-1][cy  ] !== '1' && ! cp.isinarr(cx-1,cy  ) ){ cp.unshift([cx-1,cy  ]); continue; }
+    if( adatav[cx  ][cy  ] !== '1' && ! cp.isinarr(cx+1,cy  ) ){ cp.unshift([cx+1,cy  ]); continue; }
+    if( adatah[cx  ][cy-1] !== '1' && ! cp.isinarr(cx  ,cy-1) ){ cp.unshift([cx  ,cy-1]); continue; }
+    if( adatah[cx  ][cy  ] !== '1' && ! cp.isinarr(cx  ,cy+1) ){ cp.unshift([cx  ,cy+1]); continue; }
+  }
+  let newx = dragpath[1][0];
+  let newy = dragpath[1][1];
+  dragpath = [];
+  for( let i = 0; i < cp.length; i ++ ){
+    dragpath.push([cp[i][0],cp[i][1]]);
+  }
+  dragpath.push([newx,newy]);
+  celleraser = false;
+  isfirstcellchange = false;
+  if( adatac[dragpath[0][0]][dragpath[0][1]].match(/[1-4]/) !== null ){
+    button = buttonid.right;
+  }
+  return true;
+},
+//%}}}
+
+// 線が軸に突入する時に背景色や壁も変更したほうが使いやすいかも(ただ正規ルールの場合はむしろ突入を禁止した方が良いかも)
+// 軸の取り消し操作はワンクリックで出来て、そのまま直接ドラッグで新しい軸が描画できるようにしても良いかも(TheWitnessみたく)
 
 // shadetoggle %{{{
 shadetoggle: function (str) {

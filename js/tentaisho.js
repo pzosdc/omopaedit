@@ -8,6 +8,8 @@ mousemove: function (){
   } else if( editmode === 'ac' ){
     if( button === buttonid.left ){
       oae_leftclick();
+    } else if( button === buttonid.right ){
+      oae_rightclick();
     }
   } else if( editmode === 'aw' ){
     if( button === buttonid.left ){
@@ -52,6 +54,8 @@ rightclick: function (){
     }
     qdatap[focusx][focusy] = str;
     oaedrawqdata();
+  } else if( editmode === 'ac' ){
+    oae_unshade();
   }
 },
 //%}}}
@@ -65,6 +69,58 @@ keydown: function (){
 shadetoggle: function (str) {
   'use strict';
   return ( str === '.' ) ? '=' : '.';
+},
+//%}}}
+// unshadetoggle %{{{
+unshadetoggle: function (str) {
+  'use strict';
+  return ( str === '.' ) ? '-' : '.';
+},
+//%}}}
+
+// pzprfileinput %{{{
+pzprfileinput: function () {
+  'use strict';
+  tentaisho.pzprfileinput_qdatap();
+  oaefileinput_main_adatav();
+  oaefileinput_main_adatah();
+  tentaisho.pzprfileinput_adatac();
+},
+//%}}}
+// pzprfileinput_qdatap %{{{
+pzprfileinput_qdatap: function () {
+  'use strict';
+  for( let iy = 2*ndivy; iy >= 2; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s*/);
+    for( let ix = 2; ix <= 2*ndivx; ix ++ ){
+      qdatap[ix][iy] = words[ix-2];
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+// pzprfileinput_adatac %{{{
+pzprfileinput_adatac: function () {
+  'use strict';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s+/);
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( words[ix-1] === '0' ){
+        adatac[ix][iy] = '.';
+      } else if ( words[ix-1] === '1' ){
+        adatac[ix][iy] = '=';
+      } else if ( words[ix-1] === '2' ){
+        adatac[ix][iy] = '-';
+      } else if ( words[ix-1] === '3' ){
+        adatac[ix][iy] = '#';
+      }
+    }
+    filebuffer.shift();
+  }
+  return;
 },
 //%}}}
 
@@ -88,6 +144,10 @@ layersinglier: function (){
       let str = adatac[ix][iy];
       if( str === '=' ){
         oaedrawadata_c_shade(centx,centy,bgcontext);
+      } else if( str === '-' ){
+        oaedrawadata_c_shade_2(centx,centy,bgcontext);
+      } else if( str === '#' ){
+        oaedrawadata_c_shade_sub(centx,centy,bgcontext);
       }
     }
   }

@@ -39,6 +39,7 @@ var problemlinecolor;
 var problemshadecolor;
 var answerlinecolor;
 var answershadecolor;
+var answershadecolor2;
 var opacity;
 // context
 var histcontext;
@@ -369,6 +370,7 @@ function oaeinitcolor(){
   problemshadecolor = '#cccccc';
   answerlinecolor = '#319431';
   answershadecolor = '#31ff31';
+  answershadecolor2 = '#666666';
   if( document.getElementById('oaeproblemlinecolor') !== null ){
     problemlinecolor = document.getElementById('oaeproblemlinecolor').value;
   }
@@ -380,6 +382,9 @@ function oaeinitcolor(){
   }
   if( document.getElementById('oaeanswershadecolor') !== null ){
     answershadecolor = document.getElementById('oaeanswershadecolor').value;
+  }
+  if( document.getElementById('oaeanswershadecolor2') !== null ){
+    answershadecolor2 = document.getElementById('oaeanswershadecolor2').value;
   }
   return;
 }
@@ -770,6 +775,12 @@ function oaeeventdef(){
   // oaeanswershadecolor
   if( document.getElementById('oaeanswershadecolor') !== null ){
     document.getElementById('oaeanswershadecolor').onchange = function() {
+      oae_setcolor();
+    };
+  }
+  // oaeanswershadecolor2
+  if( document.getElementById('oaeanswershadecolor2') !== null ){
+    document.getElementById('oaeanswershadecolor2').onchange = function() {
       oae_setcolor();
     };
   }
@@ -1199,7 +1210,7 @@ function oae_unshadetoggle(str){
   } else if( puzzletype === 'doublechoco' ){
     return doublechoco.shadetoggle(str);
   } else if( puzzletype === 'tentaisho' ){
-    return tentaisho.shadetoggle(str);
+    return tentaisho.unshadetoggle(str);
   } else if( puzzletype === 'midloop' ){
   } else if( puzzletype === 'squlin' ){
     return squlin.unshadetoggle(str);
@@ -1965,6 +1976,9 @@ function oaefile_urldecode(str){
 function oaefileinput_file(ev){
   'use strict';
   let file = ev.dataTransfer.files[0];
+  let filename = file.name;
+  if( filename.match(/\.txt$/) !== null ) filename = filename.substring(0,filename.length-4);
+  document.getElementById('oaeheader').value = filename;
   if( file.type === 'text/plain' ){
     let fr = new FileReader();
     fr.readAsText(file);
@@ -2022,12 +2036,17 @@ function oaefileinput_base(str){
   // qdatac, adatac などの処理は別関数で処理するため
   // グローバル変数に預けておく
   filebuffer = arr;
-  if( hasqdatap ) oaefileinput_main_qdatap();
-  if( hasqdatac ) oaefileinput_main_qdatac();
-  if( hasqdatan ) oaefileinput_main_qdatan();
-  if( hasadatac ) oaefileinput_main_adatac();
-  if( hasadatav ) oaefileinput_main_adatav();
-  if( hasadatah ) oaefileinput_main_adatah();
+  if( formatstr === 'pzprv3' ){
+    if( puzzletype === 'tentaisho' ){ tentaisho.pzprfileinput();
+    }
+  } else if( formatstr === 'oaef0' ){
+    if( hasqdatap ) oaefileinput_main_qdatap();
+    if( hasqdatac ) oaefileinput_main_qdatac();
+    if( hasqdatan ) oaefileinput_main_qdatan();
+    if( hasadatac ) oaefileinput_main_adatac();
+    if( hasadatav ) oaefileinput_main_adatav();
+    if( hasadatah ) oaefileinput_main_adatah();
+  }
   // 描画
   oaesizeadjust();
   oaedrawgrid();
@@ -2787,6 +2806,8 @@ function oaedrawadata_c(){
       let str = adatac[ix][iy];
       if( str === '=' ){
         oaedrawadata_c_shade(centx,centy,bgcontext);
+      } else if( str === '-' ){
+        oaedrawadata_c_shade_2(centx,centy,bgcontext);
       } else if( str === '#' ){
         oaedrawadata_c_shade_sub(centx,centy,bgcontext);
       } else {
@@ -2802,6 +2823,23 @@ function oaedrawadata_c_shade(cx,cy,targetcontext){
   'use strict';
   targetcontext.fillStyle = answershadecolor;
   targetcontext.strokeStyle = answershadecolor;
+  targetcontext.globalAlpha = opacity;
+  targetcontext.lineWidth = Math.max( 1, Math.floor(gridlinewidth * cellunit) );
+  let pf = targetcontext.lineWidth % 2 === 1 ? 0.5 : 0;
+  targetcontext.moveTo( cx -    0.5*cellwidth, cy -    0.5*cellheight );
+  targetcontext.lineTo( cx -    0.5*cellwidth, cy +pf+ 0.5*cellheight );
+  targetcontext.lineTo( cx +pf+ 0.5*cellwidth, cy +pf+ 0.5*cellheight );
+  targetcontext.lineTo( cx +pf+ 0.5*cellwidth, cy -    0.5*cellheight );
+  targetcontext.closePath();
+  targetcontext.fill();
+  oae_resetstyle(targetcontext);
+}
+//%}}}
+// oaedrawadata_c_shade_2 %{{{
+function oaedrawadata_c_shade_2(cx,cy,targetcontext){
+  'use strict';
+  targetcontext.fillStyle = answershadecolor2;
+  targetcontext.strokeStyle = answershadecolor2;
   targetcontext.globalAlpha = opacity;
   targetcontext.lineWidth = Math.max( 1, Math.floor(gridlinewidth * cellunit) );
   let pf = targetcontext.lineWidth % 2 === 1 ? 0.5 : 0;
@@ -3141,22 +3179,7 @@ function oae_incrementmode(){
 // oae_setcolor %{{{
 function oae_setcolor(){
   'use strict';
-  problemlinecolor = '#111111';
-  problemshadecolor = '#cccccc';
-  answerlinecolor = '#319431';
-  answershadecolor = '#31ff31';
-  if( document.getElementById('oaeproblemlinecolor') !== null ){
-    problemlinecolor = document.getElementById('oaeproblemlinecolor').value;
-  }
-  if( document.getElementById('oaeproblemshadecolor') !== null ){
-    problemshadecolor = document.getElementById('oaeproblemshadecolor').value;
-  }
-  if( document.getElementById('oaeanswerlinecolor') !== null ){
-    answerlinecolor = document.getElementById('oaeanswerlinecolor').value;
-  }
-  if( document.getElementById('oaeanswershadecolor') !== null ){
-    answershadecolor = document.getElementById('oaeanswershadecolor').value;
-  }
+  oaeinitcolor();
   oaerewriteall();
   return;
 }
