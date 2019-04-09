@@ -3,7 +3,7 @@
 && Maintainer  : pzdc
 && Lastchange  : 2019, Apr. 10
 
-&(; title  &|; omopaedit &;version &; 1.1 &; 簡易マニュアル &);
+&(; title  &|; omopaedit &;version &; 1.2 &; 簡易マニュアル &);
 &(; author &|; pzdc &);
 &(; date   &|; 2019,&; Apr. &; 10 &);
 &maketitle;
