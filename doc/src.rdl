@@ -1,11 +1,11 @@
 && Language    : RDL
 && Description : omopaedit manual
 && Maintainer  : pzdc
-&& Lastchange  : 2019, Apr. 4
+&& Lastchange  : 2019, Apr. 10
 
 &(; title  &|; omopaedit &;version &; 1.1 &; 簡易マニュアル &);
 &(; author &|; pzdc &);
-&(; date   &|; 2019,&; Apr. &; 4 &);
+&(; date   &|; 2019,&; Apr. &; 10 &);
 &maketitle;
 
 &(C;
@@ -122,6 +122,7 @@
     問題の芯があるマスから軸方向に左ドラッグで軸の描画(ドラッグの間初期挙動に依存)
     芯のあるマスから右ドラッグで線の入力(ドラッグの間初期挙動に依存)
     問題の芯があるマスから左ドラッグで線の入力(ドラッグの間初期挙動に依存)
+    軸の末端からドラッグで軸の伸縮
     &-n;
   &)L;
   &(L; AW &|L;

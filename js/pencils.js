@@ -38,6 +38,11 @@ mousemove: function () {
           oae_path();
           editmode = 'ac';
         }
+      } else if( pencils.isinjiku(dragpath[0][0],dragpath[0][1]) ){
+        if( pencils.isatjikuend(dragpath[0][0],dragpath[0][1]) ){
+          pencils.reconfigurejiku(dragpath[0][0],dragpath[0][1]);
+          pencils.jikushade();
+        }
       } else {
         let relx = dragpath[dragpath.length-1][0] - dragpath[0][0];
         let rely = dragpath[dragpath.length-1][1] - dragpath[0][1];
@@ -358,14 +363,81 @@ retracejiku: function (px,py){
   }
 },
 //%}}}
-// 既に描画されている軸の先端からドラッグで軸描画に移行するようにすると便利（ただしループを含まない正常な軸である必要がある）
+// isinjiku %{{{
+isinjiku: function (cx,cy){
+  'use strict';
+  if( isshaded(adatac[cx][cy]) ) return true;
+  return false;
+},
+//%}}}
+// isatjikuend %{{{
+isatjikuend: function (cx,cy){
+  'use strict';
+  // injikuは前提とする
+  let wallnum = 0;
+  if( adatav[cx-1][cy  ] === '1' ) wallnum += 1;
+  if( adatav[cx  ][cy  ] === '1' ) wallnum += 1;
+  if( adatah[cx  ][cy-1] === '1' ) wallnum += 1;
+  if( adatah[cx  ][cy  ] === '1' ) wallnum += 1;
+  if( wallnum === 3 ) return true;
+  return false;
+},
+//%}}}
+// reconfigurejiku %{{{
+reconfigurejiku: function (x,y){
+  'use strict';
+  // 軸の先端がクリックされた場合に芯から先端までのドラッグパスを復元する
+  // 軸の先端（壁が３つ）から、壁が２つのマスをたどっていく場合、ループになる心配はない
+  // ここでは軸に色が塗られているかどうかではなく壁ベースに判断していくことにする
+  let cp = [];
+  cp.isinarr = function(ix,iy){
+    for( let i = 0; i < this.length; i ++ ){
+      if( this[i][0] === ix && this[i][1] === iy ) return true;
+    }
+    return false;
+  };
+  cp.unshift([x,y]);
+  for( let i = 0; i < ndivx*ndivy; i ++ ){
+    let cx = cp[0][0];
+    let cy = cp[0][1];
+    if( i !== 0 ){
+      if( qdatac[cx][cy].match(/[1-4]/) !== null
+      || adatac[cx][cy].match(/[1-4]/) !== null ){
+        break;
+      }
+      let wallnum = 0;
+      if( adatav[cx-1][cy  ] === '1' ) wallnum ++;
+      if( adatav[cx  ][cy  ] === '1' ) wallnum ++;
+      if( adatah[cx  ][cy-1] === '1' ) wallnum ++;
+      if( adatah[cx  ][cy  ] === '1' ) wallnum ++;
+      if( wallnum !== 2 ){
+        // fail return
+        return false;
+      }
+    }
+    if( adatav[cx-1][cy  ] !== '1' && ! cp.isinarr(cx-1,cy  ) ){ cp.unshift([cx-1,cy  ]); continue; }
+    if( adatav[cx  ][cy  ] !== '1' && ! cp.isinarr(cx+1,cy  ) ){ cp.unshift([cx+1,cy  ]); continue; }
+    if( adatah[cx  ][cy-1] !== '1' && ! cp.isinarr(cx  ,cy-1) ){ cp.unshift([cx  ,cy-1]); continue; }
+    if( adatah[cx  ][cy  ] !== '1' && ! cp.isinarr(cx  ,cy+1) ){ cp.unshift([cx  ,cy+1]); continue; }
+  }
+  let newx = dragpath[1][0];
+  let newy = dragpath[1][1];
+  dragpath = [];
+  for( let i = 0; i < cp.length; i ++ ){
+    dragpath.push([cp[i][0],cp[i][1]]);
+  }
+  dragpath.push([newx,newy]);
+  celleraser = false;
+  isfirstcellchange = false;
+  if( adatac[dragpath[0][0]][dragpath[0][1]].match(/[1-4]/) !== null ){
+    button = buttonid.right;
+  }
+  return true;
+},
+//%}}}
+
 // 線が軸に突入する時に背景色や壁も変更したほうが使いやすいかも(ただ正規ルールの場合はむしろ突入を禁止した方が良いかも)
 // 軸の取り消し操作はワンクリックで出来て、そのまま直接ドラッグで新しい軸が描画できるようにしても良いかも(TheWitnessみたく)
-
-// 軸をすでに描画している場合で、芯の位置を後から微調整したい場合に面倒：鉛筆の「前方成長」機能の検討
-
-// 線描画も引き返し機能を実装した方が便利かも
-// ... ただし線描画はもともと軸描画よりお手軽だし、これくらいシンプルの方がわかりやすくて良いと考える
 
 // shadetoggle %{{{
 shadetoggle: function (str) {
