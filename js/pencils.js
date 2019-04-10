@@ -28,15 +28,12 @@ mousemove: function () {
     oaerewriteall();
   } else if( editmode === 'ac' ){
     if( button === buttonid.left ){
-      // left drag -> arrow
       if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ){
-        // 問題の芯からドラッグした場合は芯から出る線を描けるようにする
+        // 問題の芯からドラッグ
         if( pencils.dragfromcoreisjiku() ){ // ドラッグの最初だけでなく常に判定することによって引き返しに対応
           pencils.jikushade();
         } else {
-          editmode = 'aw'; // 一時的にAWモードにする
-          oae_path();
-          editmode = 'ac';
+          pencils.path();
         }
       } else if( pencils.isinjiku(dragpath[0][0],dragpath[0][1]) ){
         if( pencils.isatjikuend(dragpath[0][0],dragpath[0][1]) ){
@@ -44,6 +41,7 @@ mousemove: function () {
           pencils.jikushade();
         }
       } else {
+        if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^o/) !== null ) return true;
         let relx = dragpath[dragpath.length-1][0] - dragpath[0][0];
         let rely = dragpath[dragpath.length-1][1] - dragpath[0][1];
         pencils.dragarrow(dragpath[0][0],dragpath[0][1],relx,rely);
@@ -51,16 +49,13 @@ mousemove: function () {
     } else if( button === buttonid.right ){
       if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ||
       adatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ){
-        // 芯から右ドラッグした場合は芯から出る線を描けるようにする
+        // 芯から右ドラッグ
         if( pencils.dragfromcoreisjiku() ){
           pencils.jikushade();
         } else {
-          editmode = 'aw'; // 一時的にAWモードにする
-          oae_path();
-          editmode = 'ac';
+          pencils.path();
         }
       } else {
-        // right drag -> shade
         oae_shade();
       }
     }
@@ -436,8 +431,25 @@ reconfigurejiku: function (x,y){
 },
 //%}}}
 
-// 線が軸に突入する時に背景色や壁も変更したほうが使いやすいかも(ただ正規ルールの場合はむしろ突入を禁止した方が良いかも)
-// 軸の取り消し操作はワンクリックで出来て、そのまま直接ドラッグで新しい軸が描画できるようにしても良いかも(TheWitnessみたく)
+// path %{{{
+path: function (){
+  'use strict';
+  let n = dragpath.length;
+  let px = dragpath[n-2][0]; // p = previous
+  let py = dragpath[n-2][1];
+  let cx = dragpath[n-1][0]; // c = current
+  let cy = dragpath[n-1][1];
+  if( Math.pow(cx-px,2) + Math.pow(cy-py,2) !== 1 || cellisoutside(cx,cy) ||
+  qdatac[cx][cy].match(/^[1-4]/) !== null || adatac[cx][cy].match(/^[1-4]/) !== null ||
+  qdatac[cx][cy].match(/^o/) !== null || isshaded(adatac[cx][cy]) ){
+    dragpath.pop();
+    return;
+  }
+  editmode = 'aw'; // 一時的にAWモードにする
+  oae_path();
+  editmode = 'ac';
+},
+//%}}}
 
 // shadetoggle %{{{
 shadetoggle: function (str) {
