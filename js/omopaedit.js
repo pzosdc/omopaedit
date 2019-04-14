@@ -1169,7 +1169,7 @@ function isshaded(str) {
   if( str === '=' ) return true;
   if( str.match(/^\.\=[0-9]*$/) !== null ) return false;
   if( str.substring(0,1) === 'c' ) return true;
-  return true;
+  return false;
 }
 //%}}}
 // isunshaded %{{{
@@ -1184,7 +1184,7 @@ function isunshaded(str) {
   if( str.match(/^[0-9]*$/) !== null ) return true;
   if( str.match(/^\.[0-9]*$/) !== null ) return false;
   if( str.substring(0,1) === 'c' ) return true;
-  return true;
+  return false;
 }
 //%}}}
 // oae_shadetoggle %{{{
