@@ -37,9 +37,13 @@ leftclick: function (){
     } else if( str === '?' ){
       str = '1';
     } else if( str.match(/^[0-9]+$/) !== null ){
-      let num = parseInt(str,10);
-      num ++;
-      str = num.toString(10);
+      let n = parseInt(str,10);
+      n ++;
+      if( n > Math.max((ndivx-2)*ndivy,ndivx*(ndivy-2)) ){
+        str = '.';
+      } else {
+        str = n.toString(10);
+      }
     }
     qdatac[focusx][focusy] = str;
     oaedrawqdata();
