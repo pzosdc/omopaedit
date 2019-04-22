@@ -1897,6 +1897,8 @@ function oaepzproutput_base(){
   let str;
   if( puzzletype === 'tentaisho' ){
     str = tentaisho.pzprfileoutput();
+  } else if( puzzletype === 'squlin' ){
+    str = squlin.pzprfileoutput();
   } else {
     return false;
   }
@@ -2034,7 +2036,7 @@ function oaefileinput_base(str){
   puzzletype = arr[0].trim();
   oae_checkandfixpuzzletype();
   if( puzzletype === false ){
-    oaeconsolemsg('未知のパズルです')
+    oaeconsolemsg('未知のパズルです');
     return false; // unknown puzzletype
   }
   if( puzzletype !== prev_puzzletype ){
@@ -2061,7 +2063,7 @@ function oaefileinput_base(str){
     if( puzzletype === 'tentaisho' ){ tentaisho.pzprfileinput();
     } else if( puzzletype === 'squlin' ){ squlin.pzprfileinput();
     } else {
-      oaeconsolemsg('このパズルはぱずぷれ入力に対応していません')
+      oaeconsolemsg('このパズルはぱずぷれ入力に対応していません');
       return false;
     }
   } else if( formatstr === 'oaef0' ){

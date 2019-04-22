@@ -254,6 +254,57 @@ pzprfileinput_adatac: function () {
 },
 //%}}}
 
+// pzprfileoutput %{{{
+pzprfileoutput: function () {
+  'use strict';
+  let str;
+  str = 'pzprv3';
+  str = str + '\n' + 'scrin';
+  str = str + '\n' + ndivy.toString(10);
+  str = str + '\n' + ndivx.toString(10);
+  str = str + '\n';
+  str = str + squlin.pzprfileoutput_qdatac();
+  str = str + squlin.pzprfileoutput_adatac();
+  return str;
+},
+//%}}}
+// pzprfileoutput_qdatac %{{{
+pzprfileoutput_qdatac: function () {
+  'use strict';
+  let str = '';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( qdatac[ix][iy] === '?' ){
+        str = str + ' -';
+      } else {
+        str = str + ' ' + qdatac[ix][iy];
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+// pzprfileoutput_adatac %{{{
+pzprfileoutput_adatac: function () {
+  'use strict';
+  let str = '';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( adatac[ix][iy] === '=' ){
+        str = str + ' #';
+      } else if ( adatac[ix][iy] === '#' ){
+        str = str + ' +';
+      } else {
+        str = str + ' .';
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+
 // wallfix %{{{
 wallfix: function () {
   'use strict';
