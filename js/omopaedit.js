@@ -103,41 +103,6 @@ var midloop;
 var squlin;
 //%}}}
 
-// メモ %{{{
-// ix,iyは左下からの座標
-// 左下セルが(1,1)、右上のセルが(ndivx,ndivy)
-// qdatac[ix][iy]はセル(ix,iy)の表出
-// qdatav[ix][iy]はセル(ix,iy)の右の壁
-// qdatah[ix][iy]はセル(ix,iy)の上の壁
-// qdatap[2*ix][2*iy]はセル(ix,iy)の中央を指す
-// qdatan[ix][iy]はセル(ix,iy)の右上の頂点
-//----------------
-// QC
-//        '.': デフォルト値
-//    '[num]': 数値
-//        '?': 未知数
-//        'c': 黒マス
-//       'c?': 黒マスに未知数
-//   'c[num]': 黒マスに数字
-//   '.[num]': 白マスに数字
-//    '[1-4]': ペンシルズの矢印
-//        'o': ペンシルズの未知数
-//   'o[num]': ペンシルズの数値
-// QP
-//   '.': デフォルト値
-//   '1': 白丸
-//   '2': 黒丸
-// AC
-//   '.': デフォルト値
-//   '=': 黒マス
-//   '#': 黒マスではないマス
-// AV,AH:
-//   '0': デフォルト値
-//   '1': 壁あり
-//  '-1': 道あり
-//   '2': 壁と道の両方がある（対応を検討中）
-//%}}}
-
 // onload %{{{
 window.onload = function(){
   'use strict';
@@ -1908,6 +1873,38 @@ function oaefileoutput_main_adatah(){
   return str;
 }
 //%}}}
+// oaepzproutput %{{{
+function oaepzproutput(){
+  'use strict';
+  let str = oaepzproutput_base();
+  if( str === false ){
+    oaeconsolemsg('このパズルではまだぱずぷれ出力が実装されていません');
+    return;
+  }
+  let blob = new Blob([str],{type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = document.getElementById('oaeheader').value + '.txt';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+//%}}}
+// oaepzproutput_base %{{{
+function oaepzproutput_base(){
+  'use strict';
+  let str;
+  if( puzzletype === 'tentaisho' ){
+    str = tentaisho.pzprfileoutput();
+  } else if( puzzletype === 'squlin' ){
+    str = squlin.pzprfileoutput();
+  } else {
+    return false;
+  }
+  return str;
+}
+//%}}}
 // oaepngoutput %{{{
 function oaepngoutput(){
   'use strict';
@@ -1962,12 +1959,31 @@ function oaelayersinglier(){
 }
 //%}}}
 
+// oae_checkandfixpuzzletype %{{{
+function oae_checkandfixpuzzletype(){
+  'use strict';
+  if( puzzletype.match(/^pencils$/) !== null ){
+    puzzletype = 'pencils';
+  } else if( puzzletype === 'doublechoco' ){
+    puzzletype = 'doublechoco';
+  } else if( puzzletype === 'tentaisho' || puzzletype === 'tentaishow' ){
+    puzzletype = 'tentaisho';
+  } else if( puzzletype === 'midloop' ){
+    puzzletype = 'midloop';
+  } else if( puzzletype === 'squlin' || puzzletype === 'scrin' ){
+    puzzletype = 'squlin';
+  } else {
+    puzzletype = false;
+  }
+}
+//%}}}
 // oaefile_urldecode %{{{
 function oaefile_urldecode(str){
   'use strict';
   str = str.replace(/^file=/,'');
   str = str.replace(/%S/g,' ');
   str = str.replace(/%N/g,'\n');
+  str = str.replace(/%1/g,'#');
   oaefileinput_base(str);
   return;
 }
@@ -2016,10 +2032,17 @@ function oaefileinput_base(str){
     // unknown format
     return false;
   }
-  if( puzzletype !== arr[0].trim() ){
-    puzzletype = arr[0].trim();
+  let prev_puzzletype = puzzletype;
+  puzzletype = arr[0].trim();
+  oae_checkandfixpuzzletype();
+  if( puzzletype === false ){
+    oaeconsolemsg('未知のパズルです');
+    return false; // unknown puzzletype
+  }
+  if( puzzletype !== prev_puzzletype ){
     str = str.replace(/\n/g,'%N');
     str = str.replace(/\s/g,'%S');
+    str = str.replace(/#/g,'%1');
     location.replace(puzzletype+'.html?file='+str);
   }
   oae_reflectpuzzletype();
@@ -2038,6 +2061,10 @@ function oaefileinput_base(str){
   filebuffer = arr;
   if( formatstr === 'pzprv3' ){
     if( puzzletype === 'tentaisho' ){ tentaisho.pzprfileinput();
+    } else if( puzzletype === 'squlin' ){ squlin.pzprfileinput();
+    } else {
+      oaeconsolemsg('このパズルはぱずぷれ入力に対応していません');
+      return false;
     }
   } else if( formatstr === 'oaef0' ){
     if( hasqdatap ) oaefileinput_main_qdatap();
@@ -2809,7 +2836,11 @@ function oaedrawadata_c(){
       } else if( str === '-' ){
         oaedrawadata_c_shade_2(centx,centy,bgcontext);
       } else if( str === '#' ){
-        oaedrawadata_c_shade_sub(centx,centy,bgcontext);
+        if( puzzletype === 'tentaisho' ){
+          oaedrawadata_c_shade_3(centx,centy,bgcontext);
+        } else {
+          oaedrawadata_c_shade_sub(centx,centy,bgcontext);
+        }
       } else {
         pencils.draw_aarrow(centx,centy,str,mncontext);
       }
@@ -2840,6 +2871,23 @@ function oaedrawadata_c_shade_2(cx,cy,targetcontext){
   'use strict';
   targetcontext.fillStyle = answershadecolor2;
   targetcontext.strokeStyle = answershadecolor2;
+  targetcontext.globalAlpha = opacity;
+  targetcontext.lineWidth = Math.max( 1, Math.floor(gridlinewidth * cellunit) );
+  let pf = targetcontext.lineWidth % 2 === 1 ? 0.5 : 0;
+  targetcontext.moveTo( cx -    0.5*cellwidth, cy -    0.5*cellheight );
+  targetcontext.lineTo( cx -    0.5*cellwidth, cy +pf+ 0.5*cellheight );
+  targetcontext.lineTo( cx +pf+ 0.5*cellwidth, cy +pf+ 0.5*cellheight );
+  targetcontext.lineTo( cx +pf+ 0.5*cellwidth, cy -    0.5*cellheight );
+  targetcontext.closePath();
+  targetcontext.fill();
+  oae_resetstyle(targetcontext);
+}
+//%}}}
+// oaedrawadata_c_shade_3 %{{{
+function oaedrawadata_c_shade_3(cx,cy,targetcontext){
+  'use strict';
+  targetcontext.fillStyle = '#aaaaaa';
+  targetcontext.strokeStyle = '#aaaaaa';
   targetcontext.globalAlpha = opacity;
   targetcontext.lineWidth = Math.max( 1, Math.floor(gridlinewidth * cellunit) );
   let pf = targetcontext.lineWidth % 2 === 1 ? 0.5 : 0;
@@ -3017,6 +3065,12 @@ function oae_eval_cmd(str){
     oae_duplicateboard();
   } else if( str === 'consoleclean' ){
     oaeconsoleclean();
+  } else if( str === 'save' ){
+    oaefileoutput();
+  } else if( str === 'saveaspng' ){
+    oaepngoutput();
+  } else if( str === 'saveaspzpr' ){
+    oaepzproutput();
   } else {
     oaeconsolemsg('未知のコマンドです');
   }
@@ -3032,6 +3086,9 @@ function oae_help(){
   str = str + "<br/> check : 正解判定を行う";
   str = str + "<br/> dup : 盤面の複製";
   str = str + "<br/> consoleclean : 出力コンソールエリアのクリア";
+  str = str + "<br/> save : テキストファイルに保存";
+  str = str + "<br/> saveaspng : PNGとして保存";
+  str = str + "<br/> saveaspzpr : ぱずぷれファイルとして保存";
   str = str + "<br/> debug : デバッグ（開発者用）";
   str = str + "<br/> debughist : デバッグ（開発者用）";
   oaeconsolemsg(str);

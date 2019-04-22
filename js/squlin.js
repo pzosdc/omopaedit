@@ -37,14 +37,18 @@ leftclick: function (){
     } else if( str === '?' ){
       str = '1';
     } else if( str.match(/^[0-9]+$/) !== null ){
-      let num = parseInt(str,10);
-      num ++;
-      str = num.toString(10);
+      let n = parseInt(str,10);
+      n ++;
+      if( n > Math.max((ndivx-2)*ndivy,ndivx*(ndivy-2)) ){
+        str = '.';
+      } else {
+        str = n.toString(10);
+      }
     }
     qdatac[focusx][focusy] = str;
     oaedrawqdata();
   } else if( editmode === 'ac' ){
-    oae_shade();
+    squlin.squareshade();
   }
 },
 //%}}}
@@ -70,7 +74,7 @@ rightclick: function (){
     qdatac[focusx][focusy] = str;
     oaedrawqdata();
   } else if( editmode === 'ac' ){
-    oae_unshade();
+    squlin.squareunshade();
   }
 },
 //%}}}
@@ -133,6 +137,219 @@ shadetoggle: function (str) {
 unshadetoggle: function (str) {
   'use strict';
   return ( str === '.' ) ? '#' : '.';
+},
+//%}}}
+
+// squareshade %{{{
+squareshade: function () {
+  'use strict';
+  let n = dragpath.length;
+  let cx = dragpath[n-1][0]; // c = current
+  let cy = dragpath[n-1][1];
+  if( cellisoutside(cx,cy) ){
+    dragpath.pop();
+    return;
+  }
+  let str = focusprevstate;
+  if( isfirstcellchange ){
+    celleraser = isshaded(str);
+    str = oae_shadetoggle(str);
+  } else {
+    if( celleraser === isshaded(str) ){
+      str = oae_shadetoggle(str);
+    }
+  }
+  if( str === null ) return;
+  isfirstcellchange = false;
+  adatac[focusx][focusy] = str;
+  if( isshaded(adatac[cx][cy]) === isshaded(adatac[cx+1][cy]) ) adatav[cx  ][cy] = '0';
+  if( isshaded(adatac[cx][cy]) !== isshaded(adatac[cx+1][cy]) ) adatav[cx  ][cy] = '1';
+  if( isshaded(adatac[cx][cy]) === isshaded(adatac[cx-1][cy]) ) adatav[cx-1][cy] = '0';
+  if( isshaded(adatac[cx][cy]) !== isshaded(adatac[cx-1][cy]) ) adatav[cx-1][cy] = '1';
+  if( isshaded(adatac[cx][cy]) === isshaded(adatac[cx][cy+1]) ) adatah[cx][cy  ] = '0';
+  if( isshaded(adatac[cx][cy]) !== isshaded(adatac[cx][cy+1]) ) adatah[cx][cy  ] = '1';
+  if( isshaded(adatac[cx][cy]) === isshaded(adatac[cx][cy-1]) ) adatah[cx][cy-1] = '0';
+  if( isshaded(adatac[cx][cy]) !== isshaded(adatac[cx][cy-1]) ) adatah[cx][cy-1] = '1';
+  oaerewriteall();
+},
+//%}}}
+// squareunshade %{{{
+squareunshade: function () {
+  'use strict';
+  let n = dragpath.length;
+  let cx = dragpath[n-1][0]; // c = current
+  let cy = dragpath[n-1][1];
+  if( cellisoutside(cx,cy) ){
+    dragpath.pop();
+    return;
+  }
+  let str = focusprevstate;
+  if( isfirstcellchange ){
+    celleraser = isunshaded(str);
+    str = oae_unshadetoggle(str);
+  } else {
+    if( celleraser === isunshaded(str) ){
+      str = oae_unshadetoggle(str);
+    }
+  }
+  if( str === null ) return;
+  isfirstcellchange = false;
+  adatac[focusx][focusy] = str;
+  if( isshaded(adatac[cx][cy]) === isshaded(adatac[cx+1][cy]) ) adatav[cx  ][cy] = '0';
+  if( isshaded(adatac[cx][cy]) !== isshaded(adatac[cx+1][cy]) ) adatav[cx  ][cy] = '1';
+  if( isshaded(adatac[cx][cy]) === isshaded(adatac[cx-1][cy]) ) adatav[cx-1][cy] = '0';
+  if( isshaded(adatac[cx][cy]) !== isshaded(adatac[cx-1][cy]) ) adatav[cx-1][cy] = '1';
+  if( isshaded(adatac[cx][cy]) === isshaded(adatac[cx][cy+1]) ) adatah[cx][cy  ] = '0';
+  if( isshaded(adatac[cx][cy]) !== isshaded(adatac[cx][cy+1]) ) adatah[cx][cy  ] = '1';
+  if( isshaded(adatac[cx][cy]) === isshaded(adatac[cx][cy-1]) ) adatah[cx][cy-1] = '0';
+  if( isshaded(adatac[cx][cy]) !== isshaded(adatac[cx][cy-1]) ) adatah[cx][cy-1] = '1';
+  oaerewriteall();
+},
+//%}}}
+
+// pzprfileinput %{{{
+pzprfileinput: function () {
+  'use strict';
+  squlin.pzprfileinput_qdatac();
+  squlin.pzprfileinput_adatac();
+  squlin.wallfix();
+},
+//%}}}
+// pzprfileinput_qdatac %{{{
+pzprfileinput_qdatac: function () {
+  'use strict';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s*/);
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( words[ix-1] === '-' ){
+        qdatac[ix][iy] = '?';
+      } else {
+        qdatac[ix][iy] = words[ix-1];
+      }
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+// pzprfileinput_adatac %{{{
+pzprfileinput_adatac: function () {
+  'use strict';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s+/);
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( words[ix-1] === '#' ){
+        adatac[ix][iy] = '=';
+      } else if( words[ix-1] === '+' ){
+        adatac[ix][iy] = '#';
+      } else {
+        adatac[ix][iy] = '.';
+      }
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+
+// pzprfileoutput %{{{
+pzprfileoutput: function () {
+  'use strict';
+  let str;
+  str = 'pzprv3';
+  str = str + '\n' + 'scrin';
+  str = str + '\n' + ndivy.toString(10);
+  str = str + '\n' + ndivx.toString(10);
+  str = str + '\n';
+  str = str + squlin.pzprfileoutput_qdatac();
+  str = str + squlin.pzprfileoutput_adatac();
+  return str;
+},
+//%}}}
+// pzprfileoutput_qdatac %{{{
+pzprfileoutput_qdatac: function () {
+  'use strict';
+  let str = '';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( qdatac[ix][iy] === '?' ){
+        str = str + ' -';
+      } else {
+        str = str + ' ' + qdatac[ix][iy];
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+// pzprfileoutput_adatac %{{{
+pzprfileoutput_adatac: function () {
+  'use strict';
+  let str = '';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( adatac[ix][iy] === '=' ){
+        str = str + ' #';
+      } else if ( adatac[ix][iy] === '#' ){
+        str = str + ' +';
+      } else {
+        str = str + ' .';
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+
+// wallfix %{{{
+wallfix: function () {
+  'use strict';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix < ndivx; ix ++ ){
+      if( isshaded(adatac[ix][iy]) !== isshaded(adatac[ix+1][iy]) ){
+        adatav[ix][iy] = '1';
+      } else {
+        adatav[ix][iy] = '0';
+      }
+    }
+  }
+  for( let iy = ndivy-1; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( isshaded(adatac[ix][iy]) !== isshaded(adatac[ix][iy+1]) ){
+        adatah[ix][iy] = '1';
+      } else {
+        adatah[ix][iy] = '0';
+      }
+    }
+  }
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    if( isshaded(adatac[ix][1]) ){
+      adatah[ix][0] = '1';
+    } else {
+      adatah[ix][0] = '0';
+    }
+    if( isshaded(adatac[ix][ndivy]) ){
+      adatah[ix][ndivy] = '1';
+    } else {
+      adatah[ix][ndivy] = '0';
+    }
+  }
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    if( isshaded(adatac[1][iy]) ){
+      adatav[0][iy] = '1';
+    } else {
+      adatav[0][iy] = '0';
+    }
+    if( isshaded(adatac[ndivx][iy]) ){
+      adatav[ndivx][iy] = '1';
+    } else {
+      adatav[ndivx][iy] = '0';
+    }
+  }
 },
 //%}}}
 
