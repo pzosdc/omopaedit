@@ -207,6 +207,101 @@ squareunshade: function () {
 },
 //%}}}
 
+// pzprfileinput %{{{
+pzprfileinput: function () {
+  'use strict';
+  squlin.pzprfileinput_qdatac();
+  squlin.pzprfileinput_adatac();
+  squlin.wallfix();
+},
+//%}}}
+// pzprfileinput_qdatac %{{{
+pzprfileinput_qdatac: function () {
+  'use strict';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s*/);
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( words[ix-1] === '-' ){
+        qdatac[ix][iy] = '?';
+      } else {
+        qdatac[ix][iy] = words[ix-1];
+      }
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+// pzprfileinput_adatac %{{{
+pzprfileinput_adatac: function () {
+  'use strict';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s+/);
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( words[ix-1] === '#' ){
+        adatac[ix][iy] = '=';
+      } else if( words[ix-1] === '+' ){
+        adatac[ix][iy] = '#';
+      } else {
+        adatac[ix][iy] = '.';
+      }
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+
+// wallfix %{{{
+wallfix: function () {
+  'use strict';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix < ndivx; ix ++ ){
+      if( isshaded(adatac[ix][iy]) !== isshaded(adatac[ix+1][iy]) ){
+        adatav[ix][iy] = '1';
+      } else {
+        adatav[ix][iy] = '0';
+      }
+    }
+  }
+  for( let iy = ndivy-1; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( isshaded(adatac[ix][iy]) !== isshaded(adatac[ix][iy+1]) ){
+        adatah[ix][iy] = '1';
+      } else {
+        adatah[ix][iy] = '0';
+      }
+    }
+  }
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    if( isshaded(adatac[ix][1]) ){
+      adatah[ix][0] = '1';
+    } else {
+      adatah[ix][0] = '0';
+    }
+    if( isshaded(adatac[ix][ndivy]) ){
+      adatah[ix][ndivy] = '1';
+    } else {
+      adatah[ix][ndivy] = '0';
+    }
+  }
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    if( isshaded(adatac[1][iy]) ){
+      adatav[0][iy] = '1';
+    } else {
+      adatav[0][iy] = '0';
+    }
+    if( isshaded(adatac[ndivx][iy]) ){
+      adatav[ndivx][iy] = '1';
+    } else {
+      adatav[ndivx][iy] = '0';
+    }
+  }
+},
+//%}}}
+
 // layersinglier %{{{
 layersinglier: function (){
   'use strict';

@@ -124,6 +124,57 @@ pzprfileinput_adatac: function () {
 },
 //%}}}
 
+// pzprfileoutput %{{{
+pzprfileoutput: function () {
+  'use strict';
+  let str;
+  str = 'pzprv3';
+  str = str + '\n' + puzzletype;
+  str = str + '\n' + ndivy.toString(10);
+  str = str + '\n' + ndivx.toString(10);
+  str = str + '\n';
+  str = str + tentaisho.pzprfileoutput_qdatap();
+  str = str + oaefileoutput_main_adatav();
+  str = str + oaefileoutput_main_adatah();
+  str = str + tentaisho.pzprfileoutput_adatac();
+  return str;
+},
+//%}}}
+// pzprfileoutput_qdatap %{{{
+pzprfileoutput_qdatap: function () {
+  'use strict';
+  let str = '';
+  for( let iy = 2*ndivy; iy >= 2; iy -- ){
+    for( let ix = 2; ix <= 2*ndivx; ix ++ ){
+      str = str + qdatap[ix][iy];
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+// pzprfileoutput_adatac %{{{
+pzprfileoutput_adatac: function () {
+  'use strict';
+  let str = '';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( adatac[ix][iy] === '.' ){
+        str = str + ' 0';
+      } else if ( adatac[ix][iy] === '=' ){
+        str = str + ' 1';
+      } else if ( adatac[ix][iy] === '-' ){
+        str = str + ' 2';
+      } else if ( adatac[ix][iy] === '#' ){
+        str = str + ' 3';
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+
 // layersinglier %{{{
 layersinglier: function (){
   'use strict';

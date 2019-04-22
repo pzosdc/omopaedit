@@ -1,11 +1,11 @@
 && Language    : RDL
 && Description : omopaedit manual
 && Maintainer  : pzdc
-&& Lastchange  : 2019, Apr. 14
+&& Lastchange  : 2019, Apr. 22
 
 &(; title  &|; omopaedit &;version &; 1.3 &; 簡易マニュアル &);
 &(; author &|; pzdc &);
-&(; date   &|; 2019,&; Apr. &; 14 &);
+&(; date   &|; 2019,&; Apr. &; 22 &);
 &maketitle;
 
 &(C;
@@ -89,6 +89,9 @@
   &(L; &fI;check&fO; &|L; 正解判定 &)L;
   &(L; &fI;dup&fO; &|L; 現在盤面の複製 &)L;
   &(L; &fI;consoleclean&fO; &|L; 出力コンソールエリアのクリア &)L;
+  &(L; &fI;save&fO; &|L; テキストファイルに保存 &)L;
+  &(L; &fI;saveaspng&fO; &|L; PNGとして保存 &)L;
+  &(L; &fI;saveaspzpr&fO; &|L; ぱずぷれファイルとして保存 &)L;
   &(L; &fI;debug&fO; &|L; デバッグ（開発者用） &)L;
   &(L; &fI;debughist&fO; &|L; 履歴をデバッグ（開発者用） &)L;
 &)S;

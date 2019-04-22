@@ -1873,6 +1873,36 @@ function oaefileoutput_main_adatah(){
   return str;
 }
 //%}}}
+// oaepzproutput %{{{
+function oaepzproutput(){
+  'use strict';
+  let str = oaepzproutput_base();
+  if( str === false ){
+    oaeconsolemsg('このパズルではまだぱずぷれ出力が実装されていません');
+    return;
+  }
+  let blob = new Blob([str],{type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = document.getElementById('oaeheader').value + '.txt';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+//%}}}
+// oaepzproutput_base %{{{
+function oaepzproutput_base(){
+  'use strict';
+  let str;
+  if( puzzletype === 'tentaisho' ){
+    str = tentaisho.pzprfileoutput();
+  } else {
+    return false;
+  }
+  return str;
+}
+//%}}}
 // oaepngoutput %{{{
 function oaepngoutput(){
   'use strict';
@@ -1927,6 +1957,24 @@ function oaelayersinglier(){
 }
 //%}}}
 
+// oae_checkandfixpuzzletype %{{{
+function oae_checkandfixpuzzletype(){
+  'use strict';
+  if( puzzletype.match(/^pencils$/) !== null ){
+    puzzletype = 'pencils';
+  } else if( puzzletype === 'doublechoco' ){
+    puzzletype = 'doublechoco';
+  } else if( puzzletype === 'tentaisho' || puzzletype === 'tentaishow' ){
+    puzzletype = 'tentaisho';
+  } else if( puzzletype === 'midloop' ){
+    puzzletype = 'midloop';
+  } else if( puzzletype === 'squlin' || puzzletype === 'scrin' ){
+    puzzletype = 'squlin';
+  } else {
+    puzzletype = false;
+  }
+}
+//%}}}
 // oaefile_urldecode %{{{
 function oaefile_urldecode(str){
   'use strict';
@@ -1981,8 +2029,14 @@ function oaefileinput_base(str){
     // unknown format
     return false;
   }
-  if( puzzletype !== arr[0].trim() ){
-    puzzletype = arr[0].trim();
+  let prev_puzzletype = puzzletype;
+  puzzletype = arr[0].trim();
+  oae_checkandfixpuzzletype();
+  if( puzzletype === false ){
+    oaeconsolemsg('未知のパズルです')
+    return false; // unknown puzzletype
+  }
+  if( puzzletype !== prev_puzzletype ){
     str = str.replace(/\n/g,'%N');
     str = str.replace(/\s/g,'%S');
     location.replace(puzzletype+'.html?file='+str);
@@ -2003,6 +2057,10 @@ function oaefileinput_base(str){
   filebuffer = arr;
   if( formatstr === 'pzprv3' ){
     if( puzzletype === 'tentaisho' ){ tentaisho.pzprfileinput();
+    } else if( puzzletype === 'squlin' ){ squlin.pzprfileinput();
+    } else {
+      oaeconsolemsg('このパズルはぱずぷれ入力に対応していません')
+      return false;
     }
   } else if( formatstr === 'oaef0' ){
     if( hasqdatap ) oaefileinput_main_qdatap();
@@ -3003,10 +3061,12 @@ function oae_eval_cmd(str){
     oae_duplicateboard();
   } else if( str === 'consoleclean' ){
     oaeconsoleclean();
-  } else if( str === 'saveaspng' ){
-    oaepngoutput();
   } else if( str === 'save' ){
     oaefileoutput();
+  } else if( str === 'saveaspng' ){
+    oaepngoutput();
+  } else if( str === 'saveaspzpr' ){
+    oaepzproutput();
   } else {
     oaeconsolemsg('未知のコマンドです');
   }
@@ -3022,6 +3082,9 @@ function oae_help(){
   str = str + "<br/> check : 正解判定を行う";
   str = str + "<br/> dup : 盤面の複製";
   str = str + "<br/> consoleclean : 出力コンソールエリアのクリア";
+  str = str + "<br/> save : テキストファイルに保存";
+  str = str + "<br/> saveaspng : PNGとして保存";
+  str = str + "<br/> saveaspzpr : ぱずぷれファイルとして保存";
   str = str + "<br/> debug : デバッグ（開発者用）";
   str = str + "<br/> debughist : デバッグ（開発者用）";
   oaeconsolemsg(str);
