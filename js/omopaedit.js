@@ -2774,7 +2774,11 @@ function oaedrawadata_c(){
       } else if( str === '-' ){
         oaedrawadata_c_shade_2(centx,centy,bgcontext);
       } else if( str === '#' ){
-        oaedrawadata_c_shade_sub(centx,centy,bgcontext);
+        if( puzzletype === 'tentaisho' ){
+          oaedrawadata_c_shade_3(centx,centy,bgcontext);
+        } else {
+          oaedrawadata_c_shade_sub(centx,centy,bgcontext);
+        }
       } else {
         pencils.draw_aarrow(centx,centy,str,mncontext);
       }
@@ -2805,6 +2809,23 @@ function oaedrawadata_c_shade_2(cx,cy,targetcontext){
   'use strict';
   targetcontext.fillStyle = answershadecolor2;
   targetcontext.strokeStyle = answershadecolor2;
+  targetcontext.globalAlpha = opacity;
+  targetcontext.lineWidth = Math.max( 1, Math.floor(gridlinewidth * cellunit) );
+  let pf = targetcontext.lineWidth % 2 === 1 ? 0.5 : 0;
+  targetcontext.moveTo( cx -    0.5*cellwidth, cy -    0.5*cellheight );
+  targetcontext.lineTo( cx -    0.5*cellwidth, cy +pf+ 0.5*cellheight );
+  targetcontext.lineTo( cx +pf+ 0.5*cellwidth, cy +pf+ 0.5*cellheight );
+  targetcontext.lineTo( cx +pf+ 0.5*cellwidth, cy -    0.5*cellheight );
+  targetcontext.closePath();
+  targetcontext.fill();
+  oae_resetstyle(targetcontext);
+}
+//%}}}
+// oaedrawadata_c_shade_3 %{{{
+function oaedrawadata_c_shade_3(cx,cy,targetcontext){
+  'use strict';
+  targetcontext.fillStyle = '#aaaaaa';
+  targetcontext.strokeStyle = '#aaaaaa';
   targetcontext.globalAlpha = opacity;
   targetcontext.lineWidth = Math.max( 1, Math.floor(gridlinewidth * cellunit) );
   let pf = targetcontext.lineWidth % 2 === 1 ? 0.5 : 0;
@@ -2982,6 +3003,10 @@ function oae_eval_cmd(str){
     oae_duplicateboard();
   } else if( str === 'consoleclean' ){
     oaeconsoleclean();
+  } else if( str === 'saveaspng' ){
+    oaepngoutput();
+  } else if( str === 'save' ){
+    oaefileoutput();
   } else {
     oaeconsolemsg('未知のコマンドです');
   }
