@@ -1981,6 +1981,7 @@ function oaefile_urldecode(str){
   str = str.replace(/^file=/,'');
   str = str.replace(/%S/g,' ');
   str = str.replace(/%N/g,'\n');
+  str = str.replace(/%1/g,'#');
   oaefileinput_base(str);
   return;
 }
@@ -2039,6 +2040,7 @@ function oaefileinput_base(str){
   if( puzzletype !== prev_puzzletype ){
     str = str.replace(/\n/g,'%N');
     str = str.replace(/\s/g,'%S');
+    str = str.replace(/#/g,'%1');
     location.replace(puzzletype+'.html?file='+str);
   }
   oae_reflectpuzzletype();
