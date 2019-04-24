@@ -92,6 +92,8 @@ var isfirstcellchange;
 var celleraser;
 var dragpath;
 //----------
+var objectstack;
+//----------
 //%}}}
 const buttonid = { left: 0, right: 2 };
 
@@ -145,6 +147,43 @@ function Histobj(qcin,qvin,qhin,qpin,qnin,acin,avin,ahin){
   this.adatac = acin;
   this.adatav = avin;
   this.adatah = ahin;
+}
+//%}}}
+// Stackobj %{{{
+function Stackobj(objtype,objvalue){
+  'use strict';
+  if( typeof this === 'undefined' ){
+    return new Stackobj(objtype,objvalue);
+  }
+  if( objtype === 'real' && typeof objvalue === 'number' ||
+  objtype === 'bool' && typeof objvalue === 'boolean' ||
+  objtype === 'str' && typeof objvalue === 'string'
+  ) {
+    // basic type
+    this.type = objtype;
+    this.value = objvalue;
+//-------------------------------------------------
+//  } else if( objtype === 'arr' && isoaearray(objvalue) ){
+//    // array
+//    this.type = objtype;
+//    this.value = objvalue;
+//  } else if( objtype === 'proc' && typeof objvalue === 'string' ){
+//    // procedure (handled as string in this system)
+//    this.type = objtype;
+//    this.value = objvalue;
+//  } else if( objtype === 'mark' && objvalue === '[' ||
+//  objtype === 'mark' && objvalue === ']' ){
+//    this.type = objtype;
+//    this.value = objvalue;
+//-------------------------------------------------
+  } else if( objtype === 'error' ){
+    this.type = objtype;
+    this.value = objvalue; // error info
+  } else {
+    // fail (not null object)
+    this.type = null;
+    this.value = null;
+  }
 }
 //%}}}
 
@@ -296,6 +335,7 @@ function oaeinit(){
   histheight = Math.max(totalheight,histtopheight+histbottomheight+100);
   histmainheight = histheight - histtopheight - histbottomheight;
   oaeinit_puzzle();
+  oaeinit_script();
   // ---------------------------
   focusx = -1;
   focusy = -1;
@@ -324,6 +364,12 @@ function oaeinit_puzzle(){
   } else if( puzzletype === 'squlin' ){
     //squlin.init();
   }
+}
+//%}}}
+// oaeinit_script %{{{
+function oaeinit_script(){
+  'use strict';
+  objectstack = [];
 }
 //%}}}
 // oaeinitcolor %{{{
@@ -3045,8 +3091,45 @@ function oae_clearcanvas(targetcontext){
 function oae_eval(){
   'use strict';
   let str = document.getElementById('oaeconsolein').value;
-  // [TODO] ここで字句解析と構文解析
-  oae_eval_cmd(str);
+  str = str.trim(); // 文字列の先頭と末尾の空白を削除
+  let token;
+  let strlen = str.length;
+  while( str.length > 0 ){
+    // 文字列リテラル等の処理は後から追加予定
+    let i = str.indexOf(' ');
+    if( i === -1 ){
+      token = str;
+      str = '';
+    } else if( i > 0 ){
+      token = str.substring(0,i);
+      str = str.substring(i+1);
+    } else {
+      break;
+    }
+    oae_eval_token(token);
+    str = str.trimStart();
+    if( str.length === strlen ){ break; // error infinity loop
+    } else { strlen = str.length; }
+  }
+  return;
+}
+//%}}}
+// oae_eval_token %{{{
+function oae_eval_token(token){
+  'use strict';
+  if( token.match(/^[0-9]*$/) !== null ){
+    // integer (real)
+    let n = new Stackobj( 'real', parseInt(token,10) );
+    objectstack.push(n);
+  } else if( token === 'true' ){
+    let b = new Stackobj( 'bool', true );
+    objectstack.push(b);
+  } else if( token === 'false' ){
+    let b = new Stackobj( 'bool', false );
+    objectstack.push(b);
+  } else {
+    oae_eval_cmd(token);
+  }
   return;
 }
 //%}}}
