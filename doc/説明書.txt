@@ -121,7 +121,10 @@ Date   : 2019, Apr. 23
             ぱずぷれファイルとして保存
         
         48 setcellsize
-            セルのサイズを48にする
+            セルのサイズを指定
+        
+        "saveaspng" setfileloadrc
+            ファイルロードRCスクリプトを設定
         
         debug
             デバッグ（開発者用）

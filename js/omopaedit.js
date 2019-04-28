@@ -239,6 +239,23 @@ function oaeconsolemsg(str){
   }
 }
 //%}}}
+// oaeconsolemsg_escape %{{{
+function oaeconsolemsg_escape(str){
+  'use strict';
+  str = str.replace( /&/g, '&amp;');
+  str = str.replace( /</g, '&lt;');
+  str = str.replace( />/g, '&gt;');
+  str = str.replace( /"/g, '&quot;');
+  str = str.replace( /'/g, '&#039;');
+  str = str.replace( /`/g, '&#x60;');
+  let obj = document.getElementById('oaeconsoleout');
+  if( typeof obj === 'undefined' ){
+    oaeerrmsg(str);
+  } else {
+    obj.innerHTML = str;
+  }
+}
+//%}}}
 // oaeconsoleclean %{{{
 function oaeconsoleclean(){
   'use strict';
@@ -3110,6 +3127,10 @@ function oae_clearcanvas(targetcontext){
 function oae_eval(){
   'use strict';
   let str = document.getElementById('oaeconsolein').value;
+  if( str.length === 0 ){
+    oaeconsoleclean();
+    return;
+  }
   str = str.trim(); // 文字列の先頭と末尾の空白を削除
   oae_evalscript(str);
   return;
@@ -3121,16 +3142,38 @@ function oae_evalscript(str){
   let token;
   let strlen = str.length;
   while( str.length > 0 ){
-    // 文字列リテラル等の処理は後から追加予定
-    let i = str.indexOf(' ');
-    if( i === -1 ){
-      token = str;
-      str = '';
-    } else if( i > 0 ){
-      token = str.substring(0,i);
-      str = str.substring(i+1);
+    if( str.charAt(0) === '"' ){
+      // 文字列リテラル
+      let successeos = false;
+      let escapenext = false;
+      for( let i = 1; i < str.length; i ++ ){
+        if( escapenext ){
+          escapenext = false;
+          continue;
+        }
+        if( str.charAt(i) === '\\' ) escapenext = true;
+        if( str.charAt(i) === '"' ){
+          token = str.substring(0,i+1);
+          str = str.substring(i+1);
+          successeos = true;
+          break;
+        }
+      }
+      if( ! successeos ){
+        oaeconsolemsg('文字列の途中です');
+        return;
+      }
     } else {
-      break;
+      let i = str.indexOf(' ');
+      if( i === -1 ){
+        token = str;
+        str = '';
+      } else if( i > 0 ){
+        token = str.substring(0,i);
+        str = str.substring(i+1);
+      } else {
+        break;
+      }
     }
     oae_eval_token(token);
     str = str.trimStart();
@@ -3152,11 +3195,41 @@ function oae_eval_token(token){
   } else if( token === 'false' ){
     let b = new Stackobj( 'bool', false );
     objectstack.push(b);
+  } else if( token.charAt(0) === '"' ){
+    //let b = new Stackobj( 'str', token );
+    let b = new Stackobj( 'str', oae_unquotestring(token) );
+    objectstack.push(b);
   } else if( token.match(/^[a-zA-Z][a-zA-Z0-9_]*$/) !== null ){
     oae_eval_cmd(token);
   } else {
+    // 不正な入力 ...怖い
+    oaeconsolemsg_escape('不正なトークン: '+token);
   }
   return;
+}
+//%}}}
+// oae_unquotestring %{{{
+function oae_unquotestring(str){
+  'use strict';
+  let strout = '';
+  if( str.charAt(0) === '"' ){
+    // 文字列リテラル
+    let escapenext = false;
+    for( let i = 1; i < str.length; i ++ ){
+      if( escapenext ){
+        strout = strout + str.charAt(i)
+        escapenext = false;
+        continue;
+      }
+      if( str.charAt(i) === '\\' ) escapenext = true;
+      if( str.charAt(i) === '"' ){
+        break;
+      } else {
+        strout = strout + str.charAt(i)
+      }
+    }
+  }
+  return strout;
 }
 //%}}}
 // oae_eval_cmd %{{{
@@ -3182,8 +3255,10 @@ function oae_eval_cmd(str){
     oaepzproutput();
   } else if( str === 'setcellsize' ){
     oaesetcellsize();
+  } else if( str === 'setfileloadrc' ){
+    oae_setfileloadrc();
   } else {
-    oaeconsolemsg('未知のコマンドです');
+    oaeconsolemsg_escape('未知のコマンドです: '+str);
   }
   return;
 }
@@ -3200,13 +3275,25 @@ function oae_help(){
   str = str + "<br/> save : テキストファイルに保存";
   str = str + "<br/> saveaspng : PNGとして保存";
   str = str + "<br/> saveaspzpr : ぱずぷれファイルとして保存";
-  str = str + "<br/> 48 setcellsize : セルのサイズを48にする";
+  str = str + "<br/> 48 setcellsize : セルのサイズを指定";
+  str = str + "<br/> \"saveaspng\" setfileloadrc : ファイルロードRCスクリプトの設定";
   str = str + "<br/> debug : デバッグ（開発者用）";
   str = str + "<br/> debughist : デバッグ（開発者用）";
   oaeconsolemsg(str);
 }
 //%}}}
 
+// oae_setfileloadrc %{{{
+function oae_setfileloadrc(){
+  'use strict';
+  if( objectstack.length === 0 ) return;
+  let n = objectstack.length;
+  if( objectstack[n-1].type !== 'str' ) return;
+  fileloadrc = objectstack[n-1].value;
+  oaeconsolemsg("ファイルロードRCコマンドをセットしました");
+  objectstack.pop();
+}
+//%}}}
 // oaesetcellsize %{{{
 function oaesetcellsize(){
   'use strict';
