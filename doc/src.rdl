@@ -92,6 +92,7 @@
   &(L; &fI;save&fO; &|L; テキストファイルに保存 &)L;
   &(L; &fI;saveaspng&fO; &|L; PNGとして保存 &)L;
   &(L; &fI;saveaspzpr&fO; &|L; ぱずぷれファイルとして保存 &)L;
+  &(L; 48 &; &fI;setcellsize&fO; &|L; セルのサイズを48にする &)L;
   &(L; &fI;debug&fO; &|L; デバッグ（開発者用） &)L;
   &(L; &fI;debughist&fO; &|L; 履歴をデバッグ（開発者用） &)L;
 &)S;

@@ -120,6 +120,9 @@ Date   : 2019, Apr. 23
         saveaspzpr
             ぱずぷれファイルとして保存
         
+        48 setcellsize
+            セルのサイズを48にする
+        
         debug
             デバッグ（開発者用）
         

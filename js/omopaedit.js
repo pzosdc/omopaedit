@@ -3117,8 +3117,7 @@ function oae_eval(){
 // oae_eval_token %{{{
 function oae_eval_token(token){
   'use strict';
-  if( token.match(/^[0-9]*$/) !== null ){
-    // integer (real)
+  if( token.match(/^[0-9]*$/) !== null ){ // [TODO] 実数の入力
     let n = new Stackobj( 'real', parseInt(token,10) );
     objectstack.push(n);
   } else if( token === 'true' ){
@@ -3127,8 +3126,9 @@ function oae_eval_token(token){
   } else if( token === 'false' ){
     let b = new Stackobj( 'bool', false );
     objectstack.push(b);
-  } else {
+  } else if( token.match(/^[a-zA-Z][a-zA-Z0-9_]*$/) !== null ){
     oae_eval_cmd(token);
+  } else {
   }
   return;
 }
@@ -3154,6 +3154,8 @@ function oae_eval_cmd(str){
     oaepngoutput();
   } else if( str === 'saveaspzpr' ){
     oaepzproutput();
+  } else if( str === 'setcellsize' ){
+    oaesetcellsize();
   } else {
     oaeconsolemsg('未知のコマンドです');
   }
@@ -3172,12 +3174,26 @@ function oae_help(){
   str = str + "<br/> save : テキストファイルに保存";
   str = str + "<br/> saveaspng : PNGとして保存";
   str = str + "<br/> saveaspzpr : ぱずぷれファイルとして保存";
+  str = str + "<br/> 48 setcellsize : セルのサイズを48にする";
   str = str + "<br/> debug : デバッグ（開発者用）";
   str = str + "<br/> debughist : デバッグ（開発者用）";
   oaeconsolemsg(str);
 }
 //%}}}
 
+// oaesetcellsize %{{{
+function oaesetcellsize(){
+  'use strict';
+  if( objectstack.length === 0 ) return;
+  let n = objectstack.length;
+  if( objectstack[n-1].type !== 'real' ) return;
+  let v = objectstack[n-1].value;
+  let cs = Math.round(v);
+  if( cs < 5 || cs > 100 ) return;
+  cellunit = cs;
+  oaerewriteall();
+}
+//%}}}
 // oae_aviewflip %{{{
 function oae_aviewflip(){
   'use strict';
