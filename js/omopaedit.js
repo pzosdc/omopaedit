@@ -2039,38 +2039,48 @@ function oaefile_urldecode(str){
 // oaefileinput_file %{{{
 function oaefileinput_file(ev){
   'use strict';
-  let fnum = ev.dataTransfer.files.length;
-  for( let i = 0; i < fnum; i ++ ){
-    let file = ev.dataTransfer.files[i];
-    let filename = file.name;
-    if( filename.match(/\.txt$/) !== null ) filename = filename.substring(0,filename.length-4);
-    if( file.type === 'text/plain' ){
-      let fr = new FileReader();
-      fr.readAsText(file);
-      fr.addEventListener('load',function(){
-        let str = fr.result;
-        if( oaefileinput_base(str) ){
-          // ロードに成功したタイミングでヘッダーに反映しloadrcを実行
-          // [TODO] 複数ファイルをドロップした場合イベントリスナーが複数登録されるためタイミングがずれる可能性がある。要確認
-          document.getElementById('oaeheader').value = filename;
-          if( fileloadrc !== '' ){
-            oae_evalscript(fileloadrc);
-          }
-        } else {
+  let filelist = ev.dataTransfer.files;
+  oaefileinput_filelist(0,filelist);
+  return;
+}
+//%}}}
+// oaefileinput_filelist %{{{
+function oaefileinput_filelist(i,filelist){
+  'use strict';
+  let file = filelist[i];
+  let filename = file.name;
+  if( filename.match(/\.txt$/) !== null ) filename = filename.substring(0,filename.length-4);
+  if( file.type === 'text/plain' ){
+    let fr = new FileReader();
+    fr.readAsText(file);
+    fr.addEventListener('load',function(){
+      let str = fr.result;
+      if( oaefileinput_base(str) ){
+        // ロードに成功したタイミングでヘッダーに反映しloadrcを実行
+        document.getElementById('oaeheader').value = filename;
+        if( fileloadrc !== '' ){
+          oae_evalscript(fileloadrc);
         }
-      });
-    } else if( file.type.substring(0,6) === 'image/' ){
-      // 画像だったら背景をその画像にする
-      // 画像からパズル盤面を推測する機能があると面白いかも
-      let fileurl = URL.createObjectURL(file);
-      document.getElementById('oaeboard').style.background = '#fff';
-      document.getElementById('oaeboard').style.backgroundImage =
-        'url("'+fileurl+'")';
-    } else {
-      oaeconsolemsg('ファイル形式エラー');
-      return;
-    }
+      } else {
+        oaeerrmsg("load file failed: "+filename);
+      }
+      if( filelist.length-1 === i ) return;
+      // 画像保存頻度が高すぎるとブラウザがうまく動作しないようなので一応ラグを設けておく
+      setTimeout(function(){oaefileinput_filelist(i+1,filelist);},100);
+    });
+    return;
+  } else if( file.type.substring(0,6) === 'image/' ){
+    // 画像だったら背景をその画像にする
+    // 画像からパズル盤面を推測する機能があると面白いかも
+    let fileurl = URL.createObjectURL(file);
+    document.getElementById('oaeboard').style.background = '#fff';
+    document.getElementById('oaeboard').style.backgroundImage =
+      'url("'+fileurl+'")';
+  } else {
+    oaeconsolemsg('ファイル形式エラー');
   }
+  if( filelist.length-1 === i ) return;
+  setTimeout(function(){oaefileinput_filelist(i+1,filelist);},100);
   return;
 }
 //%}}}
@@ -3101,7 +3111,7 @@ function oae_eval(){
   'use strict';
   let str = document.getElementById('oaeconsolein').value;
   str = str.trim(); // 文字列の先頭と末尾の空白を削除
-  oad_evalscript(str);
+  oae_evalscript(str);
   return;
 }
 //%}}}
