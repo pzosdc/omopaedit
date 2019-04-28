@@ -559,69 +559,6 @@ drawcore: function (cx,cy,n,targetcontext,colorin){
   oae_resetstyle(targetcontext);
 },
 //%}}}
-// layersinglier %{{{
-layersinglier: function () {
-  'use strict';
-  leftmargin = Math.floor(pngmarginscale * cellunit);
-  topmargin = Math.floor(pngmarginscale * cellunit);
-  rightmargin = Math.floor(pngmarginscale * cellunit);
-  bottommargin = Math.floor(pngmarginscale * cellunit);
-  totalwidth = gridwidth + leftmargin + rightmargin;
-  totalheight = gridheight + topmargin + bottommargin;
-  oaesizeadjust();
-  oae_clearcanvas(bgcontext);
-  oaedrawgrid_fillbackground(bgcontext);
-  if( aview ){
-    for ( let ix = 1; ix <= ndivx; ix ++ ) {
-      let centx = leftmargin + (ix-0.5) * cellunit;
-      for ( let iy = 1; iy <= ndivy; iy ++ ) {
-        if( adatac[ix][iy] === '.' ) continue;
-        let centy = topmargin + (ndivy-iy+0.5) * cellunit;
-        let str = adatac[ix][iy];
-        if( str === '=' ){
-          oaedrawadata_c_shade(centx,centy,bgcontext);
-        } else {
-        }
-      }
-    }
-  }
-  oaedrawgrid_normaldashedgrid(bgcontext);
-  oaedrawgrid_border(bgcontext);
-  if( aview ){
-    oaedrawadata_v(bgcontext);
-    oaedrawadata_h(bgcontext);
-    for ( let ix = 1; ix <= ndivx; ix ++ ) {
-      let centx = leftmargin + (ix-0.5) * cellunit;
-      for ( let iy = 1; iy <= ndivy; iy ++ ) {
-        if( adatac[ix][iy] === '.' ) continue;
-        let centy = topmargin + (ndivy-iy+0.5) * cellunit;
-        let str = adatac[ix][iy];
-        if( str === '=' ){
-        } else {
-          pencils.draw_aarrow(centx,centy,str,bgcontext);
-        }
-      }
-    }
-  }
-  for ( let ix = 1; ix <= ndivx; ix ++ ) {
-    let centx = leftmargin + (ix-0.5) * cellunit;
-    for ( let iy = 1; iy <= ndivy; iy ++ ) {
-      if( qdatac[ix][iy] === '.' ) continue;
-      let centy = topmargin + (ndivy-iy+0.5) * cellunit;
-      let str = qdatac[ix][iy];
-      if( str.substring(0,2).match(/^o[0-9]+$/) !== null ){
-        str = str.substring(1);
-        oaedrawqdata_c_num(centx,centy,str,bgcontext);
-      } else if( str === 'o' ){
-        oaedrawqdata_c_num(centx,centy,'?',bgcontext);
-      } else {
-        pencils.draw_qarrow(centx,centy,str,bgcontext);
-      }
-    }
-  }
-  return;
-},
-//%}}}
 
 // check %{{{
 check: function () {

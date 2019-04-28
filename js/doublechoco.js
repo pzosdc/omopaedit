@@ -101,42 +101,6 @@ shadetoggle: function (str) {
   }
 },
 //%}}}
-// layersinglier %{{{
-layersinglier: function (){
-  'use strict';
-  leftmargin = Math.floor(pngmarginscale * cellunit);
-  topmargin = Math.floor(pngmarginscale * cellunit);
-  rightmargin = Math.floor(pngmarginscale * cellunit);
-  bottommargin = Math.floor(pngmarginscale * cellunit);
-  totalwidth = gridwidth + leftmargin + rightmargin;
-  totalheight = gridheight + topmargin + bottommargin;
-  oaesizeadjust();
-  oae_clearcanvas(bgcontext);
-  oaedrawgrid_fillbackground(bgcontext);
-  for ( let ix = 1; ix <= ndivx; ix ++ ) {
-    let centx = leftmargin + (ix-0.5) * cellunit;
-    for ( let iy = 1; iy <= ndivy; iy ++ ) {
-      if( qdatac[ix][iy] === '.' ) continue;
-      let centy = topmargin + (ndivy-iy+0.5) * cellunit;
-      let str = qdatac[ix][iy];
-      if( str.match(/^c[0-9]*$/) !== null ){
-        oaedrawqdata_c_shade(centx,centy,bgcontext);
-      }
-      str = str.substring(1);
-      if( str !== '' ){
-        oaedrawqdata_c_num(centx,centy,str,bgcontext);
-      }
-    }
-  }
-  oaedrawgrid_normaldashedgrid(bgcontext);
-  oaedrawgrid_border(bgcontext);
-  if( aview ){
-    oaedrawadata_v(bgcontext);
-    oaedrawadata_h(bgcontext);
-  }
-  return;
-},
-//%}}}
 // check %{{{
 check: function (){
   'use strict';

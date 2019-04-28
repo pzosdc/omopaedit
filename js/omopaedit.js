@@ -93,6 +93,7 @@ var celleraser;
 var dragpath;
 //----------
 var objectstack;
+var fileloadrc;
 //----------
 //%}}}
 const buttonid = { left: 0, right: 2 };
@@ -369,6 +370,8 @@ function oaeinit_puzzle(){
 // oaeinit_script %{{{
 function oaeinit_script(){
   'use strict';
+  fileloadrc = '';
+  //fileloadrc = 'saveaspng';
   objectstack = [];
 }
 //%}}}
@@ -1986,21 +1989,20 @@ function oaepngoutput(){
 // oaelayersinglier %{{{
 function oaelayersinglier(){
   'use strict';
+  // ------------------------
   // inverse layer 'multiplier'
   // 全てのキャンバスの描画を合成して一つのキャンバスで再表現
-  // 前の方法はブラウザのアンチエイリアスの影響を受けるみたいなので個別ルーチンで再描画させることにする
-  // 何のためにレイヤー分けしたのか...
-  if( puzzletype === 'pencils' ){
-    pencils.layersinglier();
-  } else if( puzzletype === 'doublechoco' ){
-    doublechoco.layersinglier();
-  } else if( puzzletype === 'tentaisho' ){
-    tentaisho.layersinglier();
-  } else if( puzzletype === 'midloop' ){
-    midloop.layersinglier();
-  } else if( puzzletype === 'squlin' ){
-    squlin.layersinglier();
-  }
+  // ------------------------
+  leftmargin = Math.floor(pngmarginscale * cellunit);
+  topmargin = Math.floor(pngmarginscale * cellunit);
+  rightmargin = Math.floor(pngmarginscale * cellunit);
+  bottommargin = Math.floor(pngmarginscale * cellunit);
+  totalwidth = gridwidth + leftmargin + rightmargin;
+  totalheight = gridheight + topmargin + bottommargin;
+  oaerewriteall();
+  bgcontext.drawImage( document.getElementById('canvasoaegd'), 0, 0 );
+  bgcontext.drawImage( document.getElementById('canvasoaemn'), 0, 0 );
+  bgcontext.drawImage( document.getElementById('canvasoaefg'), 0, 0 );
   return;
 }
 //%}}}
@@ -2037,31 +2039,37 @@ function oaefile_urldecode(str){
 // oaefileinput_file %{{{
 function oaefileinput_file(ev){
   'use strict';
-  let file = ev.dataTransfer.files[0];
-  let filename = file.name;
-  if( filename.match(/\.txt$/) !== null ) filename = filename.substring(0,filename.length-4);
-  document.getElementById('oaeheader').value = filename;
-  if( file.type === 'text/plain' ){
-    let fr = new FileReader();
-    fr.readAsText(file);
-    fr.addEventListener('load',function(){
-      let str = fr.result;
-      if( oaefileinput_base(str) ){
-        return true;
-      } else {
-        return false;
-      }
-    });
-  } else if( file.type.substring(0,6) === 'image/' ){
-    // 画像だったら背景をその画像にする
-    // 画像からパズル盤面を推測する機能があると面白いかも
-    let fileurl = URL.createObjectURL(file);
-    document.getElementById('oaeboard').style.background = '#fff';
-    document.getElementById('oaeboard').style.backgroundImage =
-      'url("'+fileurl+'")';
-  } else {
-    oaeconsolemsg('ファイル形式エラー');
-    return;
+  let fnum = ev.dataTransfer.files.length;
+  for( let i = 0; i < fnum; i ++ ){
+    let file = ev.dataTransfer.files[i];
+    let filename = file.name;
+    if( filename.match(/\.txt$/) !== null ) filename = filename.substring(0,filename.length-4);
+    if( file.type === 'text/plain' ){
+      let fr = new FileReader();
+      fr.readAsText(file);
+      fr.addEventListener('load',function(){
+        let str = fr.result;
+        if( oaefileinput_base(str) ){
+          // ロードに成功したタイミングでヘッダーに反映しloadrcを実行
+          // [TODO] 複数ファイルをドロップした場合イベントリスナーが複数登録されるためタイミングがずれる可能性がある。要確認
+          document.getElementById('oaeheader').value = filename;
+          if( fileloadrc !== '' ){
+            oae_evalscript(fileloadrc);
+          }
+        } else {
+        }
+      });
+    } else if( file.type.substring(0,6) === 'image/' ){
+      // 画像だったら背景をその画像にする
+      // 画像からパズル盤面を推測する機能があると面白いかも
+      let fileurl = URL.createObjectURL(file);
+      document.getElementById('oaeboard').style.background = '#fff';
+      document.getElementById('oaeboard').style.backgroundImage =
+        'url("'+fileurl+'")';
+    } else {
+      oaeconsolemsg('ファイル形式エラー');
+      return;
+    }
   }
   return;
 }
@@ -2128,6 +2136,7 @@ function oaefileinput_base(str){
   oaedrawqdata();
   oaedrawadata();
   oaedrawui();
+  return true;
 }
 //%}}}
 // oaefileinput_main_qdatap %{{{
@@ -3092,6 +3101,13 @@ function oae_eval(){
   'use strict';
   let str = document.getElementById('oaeconsolein').value;
   str = str.trim(); // 文字列の先頭と末尾の空白を削除
+  oad_evalscript(str);
+  return;
+}
+//%}}}
+// oae_evalscript %{{{
+function oae_evalscript(str){
+  'use strict';
   let token;
   let strlen = str.length;
   while( str.length > 0 ){

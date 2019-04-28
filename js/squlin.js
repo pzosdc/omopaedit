@@ -353,51 +353,6 @@ wallfix: function () {
 },
 //%}}}
 
-// layersinglier %{{{
-layersinglier: function (){
-  'use strict';
-  leftmargin = Math.floor(pngmarginscale * cellunit);
-  topmargin = Math.floor(pngmarginscale * cellunit);
-  rightmargin = Math.floor(pngmarginscale * cellunit);
-  bottommargin = Math.floor(pngmarginscale * cellunit);
-  totalwidth = gridwidth + leftmargin + rightmargin;
-  totalheight = gridheight + topmargin + bottommargin;
-  oaesizeadjust();
-  oae_clearcanvas(bgcontext);
-  oaedrawgrid_fillbackground(bgcontext);
-  if( aview ){
-    for ( let ix = 1; ix <= ndivx; ix ++ ) {
-      let centx = leftmargin + (ix-0.5) * cellunit;
-      for ( let iy = 1; iy <= ndivy; iy ++ ) {
-        if( adatac[ix][iy] === '.' ) continue;
-        let centy = topmargin + (ndivy-iy+0.5) * cellunit;
-        let str = adatac[ix][iy];
-        if( str === '=' ){
-          oaedrawadata_c_shade(centx,centy,bgcontext);
-        } else if( str === '#' ){
-          oaedrawadata_c_shade_sub(centx,centy,bgcontext);
-        }
-      }
-    }
-  }
-  oaedrawgrid_dotatnode(bgcontext);
-  for ( let ix = 1; ix <= ndivx; ix ++ ) {
-    let centx = leftmargin + (ix-0.5) * cellunit;
-    for ( let iy = 1; iy <= ndivy; iy ++ ) {
-      if( qdatac[ix][iy] === '.' ) continue;
-      let str = qdatac[ix][iy];
-      let centy = topmargin + (ndivy-iy+0.5) * cellunit;
-      oaedrawqdata_c_onum(centx,centy,str,bgcontext);
-    }
-  }
-  if( aview ){
-    oaedrawadata_v(bgcontext);
-    oaedrawadata_h(bgcontext);
-  }
-  return;
-},
-//%}}}
-
 // check %{{{
 check: function (){
   'use strict';
