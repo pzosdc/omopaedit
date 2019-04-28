@@ -3190,6 +3190,7 @@ function oaesetcellsize(){
   let v = objectstack[n-1].value;
   let cs = Math.round(v);
   if( cs < 5 || cs > 100 ) return;
+  objectstack.pop();
   cellunit = cs;
   oaerewriteall();
 }
