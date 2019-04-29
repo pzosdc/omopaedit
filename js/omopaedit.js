@@ -3217,7 +3217,7 @@ function oae_unquotestring(str){
     let escapenext = false;
     for( let i = 1; i < str.length; i ++ ){
       if( escapenext ){
-        strout = strout + str.charAt(i)
+        strout = strout + str.charAt(i);
         escapenext = false;
         continue;
       }
@@ -3225,7 +3225,7 @@ function oae_unquotestring(str){
       if( str.charAt(i) === '"' ){
         break;
       } else {
-        strout = strout + str.charAt(i)
+        strout = strout + str.charAt(i);
       }
     }
   }

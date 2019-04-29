@@ -17,13 +17,13 @@ function tog(var1){
 --><!--
 --></span><!--
 --><div class="RDLtitle"><!--
--->omopaedit version 1.4 簡易マニュアル<!--
+-->omopaedit version 1.5 簡易マニュアル<!--
 --></div><!--
 --><div class="RDLauthor"><!--
 -->pzdc<!--
 --></div><!--
 --><div class="RDLdate"><!--
--->2019, Apr. 23<!--
+-->2019, Apr. 29<!--
 --></div><!--
 --><!--
 --></span><!--
@@ -319,7 +319,7 @@ function tog(var1){
 --></span><!--
 --><div class="RDLSH" id="RDLSH005" onclick="tog('RDLSC005')"><!--
 --><span><!--
--->5.   コマンドエリア（画面下部のフォーム）<!--
+-->5.   スクリプトエリア（画面下部のフォーム）<!--
 --></span><!--
 --></div><!--
 --><div class="RDLSC" id="RDLSC005"><!--
@@ -328,152 +328,10 @@ function tog(var1){
 --></span><!--
 --><div class="RDLPH" id="RDLPH005"><!--
 --><span><!--
--->盤面下部のテキストエリアにコマンドを入力し実行ボタンを押すと実行する<br/><!--
--->クリアボタンを押すとコマンド実行によって出力したメッセージを消去する<br/><!--
--->以下にコマンド一覧を示す（随時追加予定、多くなってきたら別セクションに分ける）<!--
---></span><!--
---></div><!--
---><span><!--
---><!--
---></span><!--
---><div class="RDLLH" id="RDLLH015"><!--
---><span><!--
---><span class="RDLfI">help</span><span><!--
---></span><!--
---></div><!--
---><div class="RDLLC" id="RDLLC015"><!--
---><span><!--
--->ヘルプの出力<!--
---></span><!--
---></div><!--
---><span><!--
---><!--
---></span><!--
---><div class="RDLLH" id="RDLLH016"><!--
---><span><!--
---><span class="RDLfI">check</span><span><!--
---></span><!--
---></div><!--
---><div class="RDLLC" id="RDLLC016"><!--
---><span><!--
--->正解判定<!--
---></span><!--
---></div><!--
---><span><!--
---><!--
---></span><!--
---><div class="RDLLH" id="RDLLH017"><!--
---><span><!--
---><span class="RDLfI">dup</span><span><!--
---></span><!--
---></div><!--
---><div class="RDLLC" id="RDLLC017"><!--
---><span><!--
--->現在盤面の複製<!--
---></span><!--
---></div><!--
---><span><!--
---><!--
---></span><!--
---><div class="RDLLH" id="RDLLH018"><!--
---><span><!--
---><span class="RDLfI">consoleclean</span><span><!--
---></span><!--
---></div><!--
---><div class="RDLLC" id="RDLLC018"><!--
---><span><!--
--->出力コンソールエリアのクリア<!--
---></span><!--
---></div><!--
---><span><!--
---><!--
---></span><!--
---><div class="RDLLH" id="RDLLH019"><!--
---><span><!--
---><span class="RDLfI">save</span><span><!--
---></span><!--
---></div><!--
---><div class="RDLLC" id="RDLLC019"><!--
---><span><!--
--->テキストファイルに保存<!--
---></span><!--
---></div><!--
---><span><!--
---><!--
---></span><!--
---><div class="RDLLH" id="RDLLH020"><!--
---><span><!--
---><span class="RDLfI">saveaspng</span><span><!--
---></span><!--
---></div><!--
---><div class="RDLLC" id="RDLLC020"><!--
---><span><!--
--->PNGとして保存<!--
---></span><!--
---></div><!--
---><span><!--
---><!--
---></span><!--
---><div class="RDLLH" id="RDLLH021"><!--
---><span><!--
---><span class="RDLfI">saveaspzpr</span><span><!--
---></span><!--
---></div><!--
---><div class="RDLLC" id="RDLLC021"><!--
---><span><!--
--->ぱずぷれファイルとして保存<!--
---></span><!--
---></div><!--
---><span><!--
---><!--
---></span><!--
---><div class="RDLLH" id="RDLLH022"><!--
---><span><!--
--->48 <span class="RDLfI">setcellsize</span><span><!--
---></span><!--
---></div><!--
---><div class="RDLLC" id="RDLLC022"><!--
---><span><!--
--->セルのサイズを指定<!--
---></span><!--
---></div><!--
---><span><!--
---><!--
---></span><!--
---><div class="RDLLH" id="RDLLH023"><!--
---><span><!--
--->"saveaspng" <span class="RDLfI">setfileloadrc</span><span><!--
---></span><!--
---></div><!--
---><div class="RDLLC" id="RDLLC023"><!--
---><span><!--
--->ファイルロードRCスクリプトを設定<!--
---></span><!--
---></div><!--
---><span><!--
---><!--
---></span><!--
---><div class="RDLLH" id="RDLLH024"><!--
---><span><!--
---><span class="RDLfI">debug</span><span><!--
---></span><!--
---></div><!--
---><div class="RDLLC" id="RDLLC024"><!--
---><span><!--
--->デバッグ（開発者用）<!--
---></span><!--
---></div><!--
---><span><!--
---><!--
---></span><!--
---><div class="RDLLH" id="RDLLH025"><!--
---><span><!--
---><span class="RDLfI">debughist</span><span><!--
---></span><!--
---></div><!--
---><div class="RDLLC" id="RDLLC025"><!--
---><span><!--
--->履歴をデバッグ（開発者用）<!--
+-->盤面下部のテキストエリアにスクリプトを入力し実行ボタンを押すと実行する<br/><!--
+-->クリアボタンを押すとスクリプトの実行によって出力したメッセージを消去する<br/><!--
+-->テキストエリアが空の状態で実行をしても出力メッセージを消去する<br/><!--
+-->スクリプトはスペースで区切られたトークンの列から構成され、スタック指向の処理を行う。実際のコマンドはセクション「コマンドの一覧」を参照のこと<!--
 --></span><!--
 --></div><!--
 --><span><!--
@@ -505,12 +363,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH026"><!--
+--><div class="RDLLH" id="RDLLH015"><!--
 --><span><!--
 -->QC<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC026"><!--
+--><div class="RDLLC" id="RDLLC015"><!--
 --><span><!--
 -->左クリックで芯または数字をインクリメント<br/><!--
 -->右クリックで芯または数字のデクリメント<br/><!--
@@ -526,12 +384,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH027"><!--
+--><div class="RDLLH" id="RDLLH016"><!--
 --><span><!--
 -->AC<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC027"><!--
+--><div class="RDLLC" id="RDLLC016"><!--
 --><span><!--
 -->左クリックで芯または背景色のインクリメント<br/><!--
 -->左ドラッグで芯の入力<br/><!--
@@ -549,12 +407,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH028"><!--
+--><div class="RDLLH" id="RDLLH017"><!--
 --><span><!--
 -->AW<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC028"><!--
+--><div class="RDLLC" id="RDLLC017"><!--
 --><span><!--
 -->左ドラッグで壁の入力(ドラッグの間初期挙動に依存)<br/><!--
 -->右ドラッグで線の入力(ドラッグの間初期挙動に依存)<!--
@@ -563,12 +421,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH029"><!--
+--><div class="RDLLH" id="RDLLH018"><!--
 --><span><!--
 -->入力制約<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC029"><!--
+--><div class="RDLLC" id="RDLLC018"><!--
 --><span><!--
 -->外壁上に壁を描くことを禁止<br/><!--
 -->問題の芯があるマスに解答の芯を置く操作を禁止<br/><!--
@@ -579,12 +437,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH030"><!--
+--><div class="RDLLH" id="RDLLH019"><!--
 --><span><!--
 -->正解判定について<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC030"><!--
+--><div class="RDLLC" id="RDLLC019"><!--
 --><span><!--
 -->芯から後ろ方向に下がっていき、最初に壁または外壁に衝突するまでをその鉛筆の長さと判定し、その芯から同一長さの線が分岐なしに出ているかどうかを検証する。芯の後ろの壁までの空間、すなわち「軸」に別の芯があったり線が引かれていたり、その空間を他の芯の軸と共有する場合は不正解とする。明示的に描かれている芯から出る軸と線によって全ての空間が埋め尽くされない場合は不正解とする。<br/><!--
 -->この正解判定の過程に影響しない余計な線があっても判定に影響しない。<!--
@@ -593,12 +451,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH031"><!--
+--><div class="RDLLH" id="RDLLH020"><!--
 --><span><!--
 -->ファイル構造<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC031"><!--
+--><div class="RDLLC" id="RDLLC020"><!--
 --><span><!--
 --><!--
 --></span><!--
@@ -647,12 +505,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH032"><!--
+--><div class="RDLLH" id="RDLLH021"><!--
 --><span><!--
 -->フィールド[QC]<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC032"><!--
+--><div class="RDLLC" id="RDLLC021"><!--
 --><span><!--
 -->"o[0-9]+" : 数字<br/><!--
 -->'o' : ？（未知数）<br/><!--
@@ -667,12 +525,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH033"><!--
+--><div class="RDLLH" id="RDLLH022"><!--
 --><span><!--
 -->フィールド[AC]<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC033"><!--
+--><div class="RDLLC" id="RDLLC022"><!--
 --><span><!--
 -->'1' : 上向き芯<br/><!--
 -->'2' : 下向き芯<br/><!--
@@ -686,12 +544,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH034"><!--
+--><div class="RDLLH" id="RDLLH023"><!--
 --><span><!--
 -->フィールド[AW-v]、[AW-h]<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC034"><!--
+--><div class="RDLLC" id="RDLLC023"><!--
 --><span><!--
 --><!--
 --></span><!--
@@ -723,12 +581,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH035"><!--
+--><div class="RDLLH" id="RDLLH024"><!--
 --><span><!--
 -->QC<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC035"><!--
+--><div class="RDLLC" id="RDLLC024"><!--
 --><span><!--
 -->左クリックで背景色のトグル<br/><!--
 -->左ドラッグで背景色の反転(ドラッグの間初期挙動に依存、数字もコピーされる)<br/><!--
@@ -742,12 +600,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH036"><!--
+--><div class="RDLLH" id="RDLLH025"><!--
 --><span><!--
 -->AW<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC036"><!--
+--><div class="RDLLC" id="RDLLC025"><!--
 --><span><!--
 -->左ドラッグで壁の入力(ドラッグの間初期挙動に依存)<br/><!--
 -->右ドラッグで線の入力(ドラッグの間初期挙動に依存)<!--
@@ -756,12 +614,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH037"><!--
+--><div class="RDLLH" id="RDLLH026"><!--
 --><span><!--
 -->入力制約<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC037"><!--
+--><div class="RDLLC" id="RDLLC026"><!--
 --><span><!--
 -->外壁上に壁を描くことを禁止<br/><!--
 -->表出数字の上限は(総面積)/2<!--
@@ -770,12 +628,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH038"><!--
+--><div class="RDLLH" id="RDLLH027"><!--
 --><span><!--
 -->正解判定について<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC038"><!--
+--><div class="RDLLC" id="RDLLC027"><!--
 --><span><!--
 -->壁によるブロックの仕切り方のみによって正解判定を行う。途切れている余分な壁があるかどうかは正解判定に関係しない。また壁をつらぬく中線の存在も判定に影響しない。ただし現在のバージョンでは壁と中線を同一箇所に配置できないようにしている。<!--
 --></span><!--
@@ -783,12 +641,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH039"><!--
+--><div class="RDLLH" id="RDLLH028"><!--
 --><span><!--
 -->ファイル構造<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC039"><!--
+--><div class="RDLLC" id="RDLLC028"><!--
 --><span><!--
 --><!--
 --></span><!--
@@ -819,12 +677,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH040"><!--
+--><div class="RDLLH" id="RDLLH029"><!--
 --><span><!--
 -->フィールド[QC]<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC040"><!--
+--><div class="RDLLC" id="RDLLC029"><!--
 --><span><!--
 -->"c[0-9]+" : 黒マスに数字<br/><!--
 -->'c' : 黒マス<br/><!--
@@ -836,12 +694,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH041"><!--
+--><div class="RDLLH" id="RDLLH030"><!--
 --><span><!--
 -->フィールド[AW-v]、[AW-h]<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC041"><!--
+--><div class="RDLLC" id="RDLLC030"><!--
 --><span><!--
 -->ペンシルズを参照せよ。<!--
 --></span><!--
@@ -862,12 +720,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH042"><!--
+--><div class="RDLLH" id="RDLLH031"><!--
 --><span><!--
 -->QP<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC042"><!--
+--><div class="RDLLC" id="RDLLC031"><!--
 --><span><!--
 -->左クリックで星を配置<br/><!--
 -->右クリックで星を配置(逆順)<!--
@@ -876,12 +734,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH043"><!--
+--><div class="RDLLH" id="RDLLH032"><!--
 --><span><!--
 -->AC<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC043"><!--
+--><div class="RDLLC" id="RDLLC032"><!--
 --><span><!--
 -->左クリックで背景色のトグル<br/><!--
 -->左ドラッグで背景色の反転(ドラッグの間初期挙動に依存)<br/><!--
@@ -892,12 +750,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH044"><!--
+--><div class="RDLLH" id="RDLLH033"><!--
 --><span><!--
 -->AW<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC044"><!--
+--><div class="RDLLC" id="RDLLC033"><!--
 --><span><!--
 -->左ドラッグで壁の入力(ドラッグの間初期挙動に依存)<br/><!--
 -->右ドラッグで線の入力(ドラッグの間初期挙動に依存)<!--
@@ -906,12 +764,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH045"><!--
+--><div class="RDLLH" id="RDLLH034"><!--
 --><span><!--
 -->入力制約<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC045"><!--
+--><div class="RDLLC" id="RDLLC034"><!--
 --><span><!--
 -->外壁上に壁を描くことを禁止<!--
 --></span><!--
@@ -919,12 +777,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH046"><!--
+--><div class="RDLLH" id="RDLLH035"><!--
 --><span><!--
 -->正解判定について<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC046"><!--
+--><div class="RDLLC" id="RDLLC035"><!--
 --><span><!--
 -->ダブルチョコを参照せよ<!--
 --></span><!--
@@ -932,12 +790,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH047"><!--
+--><div class="RDLLH" id="RDLLH036"><!--
 --><span><!--
 -->ファイル構造<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC047"><!--
+--><div class="RDLLC" id="RDLLC036"><!--
 --><span><!--
 --><!--
 --></span><!--
@@ -969,12 +827,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH048"><!--
+--><div class="RDLLH" id="RDLLH037"><!--
 --><span><!--
 -->フィールド[QP]<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC048"><!--
+--><div class="RDLLC" id="RDLLC037"><!--
 --><span><!--
 -->'1' : 白丸<br/><!--
 -->'2' : 黒丸<br/><!--
@@ -985,12 +843,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH049"><!--
+--><div class="RDLLH" id="RDLLH038"><!--
 --><span><!--
 -->フィールド[AC]<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC049"><!--
+--><div class="RDLLC" id="RDLLC038"><!--
 --><span><!--
 -->'=' : 背景色<br/><!--
 -->'-' : 背景色２<br/><!--
@@ -1002,12 +860,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH050"><!--
+--><div class="RDLLH" id="RDLLH039"><!--
 --><span><!--
 -->フィールド[AW-v]、[AW-h]<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC050"><!--
+--><div class="RDLLC" id="RDLLC039"><!--
 --><span><!--
 -->ペンシルズを参照せよ。<!--
 --></span><!--
@@ -1028,12 +886,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH051"><!--
+--><div class="RDLLH" id="RDLLH040"><!--
 --><span><!--
 -->QP<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC051"><!--
+--><div class="RDLLC" id="RDLLC040"><!--
 --><span><!--
 -->左クリックで黒丸を配置<br/><!--
 -->右クリックで白丸を配置<!--
@@ -1042,12 +900,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH052"><!--
+--><div class="RDLLH" id="RDLLH041"><!--
 --><span><!--
 -->AW<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC052"><!--
+--><div class="RDLLC" id="RDLLC041"><!--
 --><span><!--
 -->左ドラッグで線の入力(ドラッグの間初期挙動に依存)<br/><!--
 -->右ドラッグで壁の入力(ドラッグの間初期挙動に依存)<!--
@@ -1056,12 +914,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH053"><!--
+--><div class="RDLLH" id="RDLLH042"><!--
 --><span><!--
 -->入力制約<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC053"><!--
+--><div class="RDLLC" id="RDLLC042"><!--
 --><span><!--
 -->外壁上に壁を描くことを禁止<!--
 --></span><!--
@@ -1069,12 +927,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH054"><!--
+--><div class="RDLLH" id="RDLLH043"><!--
 --><span><!--
 -->正解判定について<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC054"><!--
+--><div class="RDLLC" id="RDLLC043"><!--
 --><span><!--
 -->中線に関して厳密な判定を行う。通過しない黒丸がある場合は不正解とする。白丸は正解判定に影響しない。壁は正解判定に影響しない。ただし中線と壁についてはダブルチョコを参照せよ<!--
 --></span><!--
@@ -1082,12 +940,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH055"><!--
+--><div class="RDLLH" id="RDLLH044"><!--
 --><span><!--
 -->ファイル構造<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC055"><!--
+--><div class="RDLLC" id="RDLLC044"><!--
 --><span><!--
 --><!--
 --></span><!--
@@ -1118,12 +976,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH056"><!--
+--><div class="RDLLH" id="RDLLH045"><!--
 --><span><!--
 -->フィールド[QP]<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC056"><!--
+--><div class="RDLLC" id="RDLLC045"><!--
 --><span><!--
 -->'1' : 白丸<br/><!--
 -->'2' : 黒丸<br/><!--
@@ -1134,12 +992,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH057"><!--
+--><div class="RDLLH" id="RDLLH046"><!--
 --><span><!--
 -->フィールド[AW-v]、[AW-h]<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC057"><!--
+--><div class="RDLLC" id="RDLLC046"><!--
 --><span><!--
 -->ペンシルズを参照せよ。<!--
 --></span><!--
@@ -1160,12 +1018,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH058"><!--
+--><div class="RDLLH" id="RDLLH047"><!--
 --><span><!--
 -->QC<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC058"><!--
+--><div class="RDLLC" id="RDLLC047"><!--
 --><span><!--
 -->左クリックで丸数字を配置<br/><!--
 -->左ドラッグで表出の移動(入れ替え方式）<br/><!--
@@ -1180,12 +1038,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH059"><!--
+--><div class="RDLLH" id="RDLLH048"><!--
 --><span><!--
 -->AC<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC059"><!--
+--><div class="RDLLC" id="RDLLC048"><!--
 --><span><!--
 -->左クリックで背景色のトグル<br/><!--
 -->左ドラッグで背景色の反転(ドラッグの間初期挙動に依存)<!--
@@ -1194,12 +1052,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH060"><!--
+--><div class="RDLLH" id="RDLLH049"><!--
 --><span><!--
 -->AW<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC060"><!--
+--><div class="RDLLC" id="RDLLC049"><!--
 --><span><!--
 -->左ドラッグで線の入力(ドラッグの間初期挙動に依存)<br/><!--
 -->右ドラッグで壁の入力(ドラッグの間初期挙動に依存)<!--
@@ -1208,12 +1066,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH061"><!--
+--><div class="RDLLH" id="RDLLH050"><!--
 --><span><!--
 -->入力制約<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC061"><!--
+--><div class="RDLLC" id="RDLLC050"><!--
 --><span><!--
 -->表出数字の上限はおよそ総面積と等しい<!--
 --></span><!--
@@ -1221,12 +1079,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH062"><!--
+--><div class="RDLLH" id="RDLLH051"><!--
 --><span><!--
 -->正解判定について<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC062"><!--
+--><div class="RDLLC" id="RDLLC051"><!--
 --><span><!--
 -->ACモードで塗った色のみによって判定を行う。壁と線は正解判定に影響しない四角によるループの内側の領域が四角の場合は不正解とする。一つの四角に複数の丸が入る場合は不正解とする。<!--
 --></span><!--
@@ -1234,12 +1092,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH063"><!--
+--><div class="RDLLH" id="RDLLH052"><!--
 --><span><!--
 -->ファイル構造<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC063"><!--
+--><div class="RDLLC" id="RDLLC052"><!--
 --><span><!--
 --><!--
 --></span><!--
@@ -1271,12 +1129,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH064"><!--
+--><div class="RDLLH" id="RDLLH053"><!--
 --><span><!--
 -->フィールド[QC]<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC064"><!--
+--><div class="RDLLC" id="RDLLC053"><!--
 --><span><!--
 -->'?' : 丸<br/><!--
 -->"[0-9]+" : 丸数字<br/><!--
@@ -1287,12 +1145,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH065"><!--
+--><div class="RDLLH" id="RDLLH054"><!--
 --><span><!--
 -->フィールド[AC]<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC065"><!--
+--><div class="RDLLC" id="RDLLC054"><!--
 --><span><!--
 -->'=' : 背景色<br/><!--
 -->'.' : オブジェクトなし<br/><!--
@@ -1302,12 +1160,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH066"><!--
+--><div class="RDLLH" id="RDLLH055"><!--
 --><span><!--
 -->フィールド[AW-v]、[AW-h]<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC066"><!--
+--><div class="RDLLC" id="RDLLC055"><!--
 --><span><!--
 -->ペンシルズを参照せよ。<!--
 --></span><!--
@@ -1341,12 +1199,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH067"><!--
+--><div class="RDLLH" id="RDLLH056"><!--
 --><span><!--
 -->F2<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC067"><!--
+--><div class="RDLLC" id="RDLLC056"><!--
 --><span><!--
 -->ヘッダーにフォーカス<!--
 --></span><!--
@@ -1354,12 +1212,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH068"><!--
+--><div class="RDLLH" id="RDLLH057"><!--
 --><span><!--
 -->Ctrl+Enter<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC068"><!--
+--><div class="RDLLC" id="RDLLC057"><!--
 --><span><!--
 -->コマンドエリアにフォーカス（コマンドエリアにフォーカスがない場合）<!--
 --></span><!--
@@ -1367,12 +1225,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH069"><!--
+--><div class="RDLLH" id="RDLLH058"><!--
 --><span><!--
 -->Ctrl+Enter<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC069"><!--
+--><div class="RDLLC" id="RDLLC058"><!--
 --><span><!--
 -->コマンドを実行（コマンドエリアにフォーカスがある場合）<!--
 --></span><!--
@@ -1380,12 +1238,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH070"><!--
+--><div class="RDLLH" id="RDLLH059"><!--
 --><span><!--
 -->ESC<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC070"><!--
+--><div class="RDLLC" id="RDLLC059"><!--
 --><span><!--
 -->任意のフォームからフォーカスを外す<!--
 --></span><!--
@@ -1393,12 +1251,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH071"><!--
+--><div class="RDLLH" id="RDLLH060"><!--
 --><span><!--
 -->Ctrl+左右キー<!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC071"><!--
+--><div class="RDLLC" id="RDLLC060"><!--
 --><span><!--
 -->モードを変更（SZモード以外からSZモードになることはない）<!--
 --></span><!--
@@ -1412,10 +1270,177 @@ function tog(var1){
 --></span><!--
 --><div class="RDLSH" id="RDLSH012" onclick="tog('RDLSC012')"><!--
 --><span><!--
--->12.  Tips<!--
+-->12.  コマンドの一覧<!--
 --></span><!--
 --></div><!--
 --><div class="RDLSC" id="RDLSC012"><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLPH" id="RDLPH014"><!--
+--><span><!--
+-->処理系はスタックを保持し、整数、ブール値、文字列がプッシュできる。<br/><!--
+-->コマンドはゼロオペランド命令であり、盤面やスタックに対して処理を命令する。コマンドは通常、半角スペース文字によってセパレートされたトークンの形式で入力される。不正な入力はHTML用にエスケープして出力する。<br/><!--
+-->以下にコマンド一覧を与える。スタックを要する命令は有効な指定を例示している。<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH061"><!--
+--><span><!--
+--><span class="RDLfI">help</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC061"><!--
+--><span><!--
+-->ヘルプの出力<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH062"><!--
+--><span><!--
+--><span class="RDLfI">check</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC062"><!--
+--><span><!--
+-->正解判定<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH063"><!--
+--><span><!--
+--><span class="RDLfI">dup</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC063"><!--
+--><span><!--
+-->現在盤面の複製<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH064"><!--
+--><span><!--
+--><span class="RDLfI">consoleclean</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC064"><!--
+--><span><!--
+-->出力コンソールエリアのクリア<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH065"><!--
+--><span><!--
+--><span class="RDLfI">save</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC065"><!--
+--><span><!--
+-->テキストファイルに保存<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH066"><!--
+--><span><!--
+--><span class="RDLfI">saveaspng</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC066"><!--
+--><span><!--
+-->PNGとして保存<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH067"><!--
+--><span><!--
+--><span class="RDLfI">saveaspzpr</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC067"><!--
+--><span><!--
+-->ぱずぷれファイルとして保存<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH068"><!--
+--><span><!--
+-->48 <span class="RDLfI">setcellsize</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC068"><!--
+--><span><!--
+-->セルのサイズを指定<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH069"><!--
+--><span><!--
+-->"saveaspng" <span class="RDLfI">setfileloadrc</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC069"><!--
+--><span><!--
+-->ファイルロードRCスクリプトを設定<br/><!--
+-->ファイルロードRCスクリプトはファイルがドロップされた際に自動で全てのドロップされたファイルに対して実行される<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH070"><!--
+--><span><!--
+--><span class="RDLfI">debug</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC070"><!--
+--><span><!--
+-->デバッグ（開発者用）<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH071"><!--
+--><span><!--
+--><span class="RDLfI">debughist</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC071"><!--
+--><span><!--
+-->履歴をデバッグ（開発者用）<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLSH" id="RDLSH013" onclick="tog('RDLSC013')"><!--
+--><span><!--
+-->13.  Tips<!--
+--></span><!--
+--></div><!--
+--><div class="RDLSC" id="RDLSC013"><!--
 --><span><!--
 -->盤面のキー入力編集は最後に盤面にあったカーソルの位置（カーソル表示をONにした場合の表示位置）に対して適用される<!--
 --></span><!--
