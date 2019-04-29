@@ -175,62 +175,6 @@ pzprfileoutput_adatac: function () {
 },
 //%}}}
 
-// layersinglier %{{{
-layersinglier: function (){
-  'use strict';
-  leftmargin = Math.floor(pngmarginscale * cellunit);
-  topmargin = Math.floor(pngmarginscale * cellunit);
-  rightmargin = Math.floor(pngmarginscale * cellunit);
-  bottommargin = Math.floor(pngmarginscale * cellunit);
-  totalwidth = gridwidth + leftmargin + rightmargin;
-  totalheight = gridheight + topmargin + bottommargin;
-  oaesizeadjust();
-  oae_clearcanvas(bgcontext);
-  oaedrawgrid_fillbackground(bgcontext);
-  for ( let ix = 1; ix <= ndivx; ix ++ ) {
-    let centx = leftmargin + (ix-0.5) * cellunit;
-    for ( let iy = 1; iy <= ndivy; iy ++ ) {
-      if( adatac[ix][iy] === '.' ) continue;
-      let centy = topmargin + (ndivy-iy+0.5) * cellunit;
-      let str = adatac[ix][iy];
-      if( str === '=' ){
-        oaedrawadata_c_shade(centx,centy,bgcontext);
-      } else if( str === '-' ){
-        oaedrawadata_c_shade_2(centx,centy,bgcontext);
-      } else if( str === '#' ){
-        oaedrawadata_c_shade_sub(centx,centy,bgcontext);
-      }
-    }
-  }
-  oaedrawgrid_normaldashedgrid(bgcontext);
-  oaedrawgrid_border(bgcontext);
-  if( aview ){
-    oaedrawadata_v(bgcontext);
-    oaedrawadata_h(bgcontext);
-  }
-  for ( let ix = 2; ix <= 2*ndivx; ix ++ ) {
-    let centx = leftmargin + (ix-1) * cellunit/2;
-    for ( let iy = 2; iy <= 2*ndivy; iy ++ ) {
-      if( typeof qdatap[ix][iy] === 'undefined' ){
-        oaeerrmsg('undefined fixed: qdatap '+ix.toString(10)+' '+iy.toString(10));
-        qdatap[ix][iy] = '.';
-      }
-      if( qdatap[ix][iy] === '.' ) continue;
-      let str = qdatap[ix][iy];
-      let centy = topmargin + (2*ndivy-iy+1) * cellunit/2;
-      if( puzzletype === 'tentaisho' ){
-        if( str === '1' ){
-          oaedrawqdata_p_smallcircle(centx,centy,false,bgcontext);
-        } else if( str === '2' ){
-          oaedrawqdata_p_smallcircle(centx,centy,true,bgcontext);
-        }
-      }
-    }
-  }
-  return;
-},
-//%}}}
-
 // check %{{{
 check: function (){
   'use strict';

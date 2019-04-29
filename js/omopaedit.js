@@ -92,6 +92,9 @@ var isfirstcellchange;
 var celleraser;
 var dragpath;
 //----------
+var objectstack;
+var fileloadrc;
+//----------
 //%}}}
 const buttonid = { left: 0, right: 2 };
 
@@ -147,6 +150,43 @@ function Histobj(qcin,qvin,qhin,qpin,qnin,acin,avin,ahin){
   this.adatah = ahin;
 }
 //%}}}
+// Stackobj %{{{
+function Stackobj(objtype,objvalue){
+  'use strict';
+  if( typeof this === 'undefined' ){
+    return new Stackobj(objtype,objvalue);
+  }
+  if( objtype === 'real' && typeof objvalue === 'number' ||
+  objtype === 'bool' && typeof objvalue === 'boolean' ||
+  objtype === 'str' && typeof objvalue === 'string'
+  ) {
+    // basic type
+    this.type = objtype;
+    this.value = objvalue;
+//-------------------------------------------------
+//  } else if( objtype === 'arr' && isoaearray(objvalue) ){
+//    // array
+//    this.type = objtype;
+//    this.value = objvalue;
+//  } else if( objtype === 'proc' && typeof objvalue === 'string' ){
+//    // procedure (handled as string in this system)
+//    this.type = objtype;
+//    this.value = objvalue;
+//  } else if( objtype === 'mark' && objvalue === '[' ||
+//  objtype === 'mark' && objvalue === ']' ){
+//    this.type = objtype;
+//    this.value = objvalue;
+//-------------------------------------------------
+  } else if( objtype === 'error' ){
+    this.type = objtype;
+    this.value = objvalue; // error info
+  } else {
+    // fail (not null object)
+    this.type = null;
+    this.value = null;
+  }
+}
+//%}}}
 
 // oae_checkminimalhtmlset %{{{
 function oae_checkminimalhtmlset(){
@@ -191,6 +231,23 @@ function oaeerrmsg(obj){
 // oaeconsolemsg %{{{
 function oaeconsolemsg(str){
   'use strict';
+  let obj = document.getElementById('oaeconsoleout');
+  if( typeof obj === 'undefined' ){
+    oaeerrmsg(str);
+  } else {
+    obj.innerHTML = str;
+  }
+}
+//%}}}
+// oaeconsolemsg_escape %{{{
+function oaeconsolemsg_escape(str){
+  'use strict';
+  str = str.replace( /&/g, '&amp;');
+  str = str.replace( /</g, '&lt;');
+  str = str.replace( />/g, '&gt;');
+  str = str.replace( /"/g, '&quot;');
+  str = str.replace( /'/g, '&#039;');
+  str = str.replace( /`/g, '&#x60;');
   let obj = document.getElementById('oaeconsoleout');
   if( typeof obj === 'undefined' ){
     oaeerrmsg(str);
@@ -296,6 +353,7 @@ function oaeinit(){
   histheight = Math.max(totalheight,histtopheight+histbottomheight+100);
   histmainheight = histheight - histtopheight - histbottomheight;
   oaeinit_puzzle();
+  oaeinit_script();
   // ---------------------------
   focusx = -1;
   focusy = -1;
@@ -324,6 +382,14 @@ function oaeinit_puzzle(){
   } else if( puzzletype === 'squlin' ){
     //squlin.init();
   }
+}
+//%}}}
+// oaeinit_script %{{{
+function oaeinit_script(){
+  'use strict';
+  fileloadrc = '';
+  //fileloadrc = 'saveaspng';
+  objectstack = [];
 }
 //%}}}
 // oaeinitcolor %{{{
@@ -1940,21 +2006,20 @@ function oaepngoutput(){
 // oaelayersinglier %{{{
 function oaelayersinglier(){
   'use strict';
+  // ------------------------
   // inverse layer 'multiplier'
   // 全てのキャンバスの描画を合成して一つのキャンバスで再表現
-  // 前の方法はブラウザのアンチエイリアスの影響を受けるみたいなので個別ルーチンで再描画させることにする
-  // 何のためにレイヤー分けしたのか...
-  if( puzzletype === 'pencils' ){
-    pencils.layersinglier();
-  } else if( puzzletype === 'doublechoco' ){
-    doublechoco.layersinglier();
-  } else if( puzzletype === 'tentaisho' ){
-    tentaisho.layersinglier();
-  } else if( puzzletype === 'midloop' ){
-    midloop.layersinglier();
-  } else if( puzzletype === 'squlin' ){
-    squlin.layersinglier();
-  }
+  // ------------------------
+  leftmargin = Math.floor(pngmarginscale * cellunit);
+  topmargin = Math.floor(pngmarginscale * cellunit);
+  rightmargin = Math.floor(pngmarginscale * cellunit);
+  bottommargin = Math.floor(pngmarginscale * cellunit);
+  totalwidth = gridwidth + leftmargin + rightmargin;
+  totalheight = gridheight + topmargin + bottommargin;
+  oaerewriteall();
+  bgcontext.drawImage( document.getElementById('canvasoaegd'), 0, 0 );
+  bgcontext.drawImage( document.getElementById('canvasoaemn'), 0, 0 );
+  bgcontext.drawImage( document.getElementById('canvasoaefg'), 0, 0 );
   return;
 }
 //%}}}
@@ -1991,21 +2056,36 @@ function oaefile_urldecode(str){
 // oaefileinput_file %{{{
 function oaefileinput_file(ev){
   'use strict';
-  let file = ev.dataTransfer.files[0];
+  let filelist = ev.dataTransfer.files;
+  oaefileinput_filelist(0,filelist);
+  return;
+}
+//%}}}
+// oaefileinput_filelist %{{{
+function oaefileinput_filelist(i,filelist){
+  'use strict';
+  let file = filelist[i];
   let filename = file.name;
   if( filename.match(/\.txt$/) !== null ) filename = filename.substring(0,filename.length-4);
-  document.getElementById('oaeheader').value = filename;
   if( file.type === 'text/plain' ){
     let fr = new FileReader();
     fr.readAsText(file);
     fr.addEventListener('load',function(){
       let str = fr.result;
       if( oaefileinput_base(str) ){
-        return true;
+        // ロードに成功したタイミングでヘッダーに反映しloadrcを実行
+        document.getElementById('oaeheader').value = filename;
+        if( fileloadrc !== '' ){
+          oae_evalscript(fileloadrc);
+        }
       } else {
-        return false;
+        oaeerrmsg("load file failed: "+filename);
       }
+      if( filelist.length-1 === i ) return;
+      // 画像保存頻度が高すぎるとブラウザがうまく動作しないようなので一応ラグを設けておく
+      setTimeout(function(){oaefileinput_filelist(i+1,filelist);},100);
     });
+    return;
   } else if( file.type.substring(0,6) === 'image/' ){
     // 画像だったら背景をその画像にする
     // 画像からパズル盤面を推測する機能があると面白いかも
@@ -2015,8 +2095,9 @@ function oaefileinput_file(ev){
       'url("'+fileurl+'")';
   } else {
     oaeconsolemsg('ファイル形式エラー');
-    return;
   }
+  if( filelist.length-1 === i ) return;
+  setTimeout(function(){oaefileinput_filelist(i+1,filelist);},100);
   return;
 }
 //%}}}
@@ -2082,6 +2163,7 @@ function oaefileinput_base(str){
   oaedrawqdata();
   oaedrawadata();
   oaedrawui();
+  return true;
 }
 //%}}}
 // oaefileinput_main_qdatap %{{{
@@ -3045,9 +3127,109 @@ function oae_clearcanvas(targetcontext){
 function oae_eval(){
   'use strict';
   let str = document.getElementById('oaeconsolein').value;
-  // [TODO] ここで字句解析と構文解析
-  oae_eval_cmd(str);
+  if( str.length === 0 ){
+    oaeconsoleclean();
+    return;
+  }
+  str = str.trim(); // 文字列の先頭と末尾の空白を削除
+  oae_evalscript(str);
   return;
+}
+//%}}}
+// oae_evalscript %{{{
+function oae_evalscript(str){
+  'use strict';
+  let token;
+  let strlen = str.length;
+  while( str.length > 0 ){
+    if( str.charAt(0) === '"' ){
+      // 文字列リテラル
+      let successeos = false;
+      let escapenext = false;
+      for( let i = 1; i < str.length; i ++ ){
+        if( escapenext ){
+          escapenext = false;
+          continue;
+        }
+        if( str.charAt(i) === '\\' ) escapenext = true;
+        if( str.charAt(i) === '"' ){
+          token = str.substring(0,i+1);
+          str = str.substring(i+1);
+          successeos = true;
+          break;
+        }
+      }
+      if( ! successeos ){
+        oaeconsolemsg('文字列の途中です');
+        return;
+      }
+    } else {
+      let i = str.indexOf(' ');
+      if( i === -1 ){
+        token = str;
+        str = '';
+      } else if( i > 0 ){
+        token = str.substring(0,i);
+        str = str.substring(i+1);
+      } else {
+        break;
+      }
+    }
+    oae_eval_token(token);
+    str = str.trimStart();
+    if( str.length === strlen ){ break; // error infinity loop
+    } else { strlen = str.length; }
+  }
+  return;
+}
+//%}}}
+// oae_eval_token %{{{
+function oae_eval_token(token){
+  'use strict';
+  if( token.match(/^[0-9]*$/) !== null ){ // [TODO] 実数の入力
+    let n = new Stackobj( 'real', parseInt(token,10) );
+    objectstack.push(n);
+  } else if( token === 'true' ){
+    let b = new Stackobj( 'bool', true );
+    objectstack.push(b);
+  } else if( token === 'false' ){
+    let b = new Stackobj( 'bool', false );
+    objectstack.push(b);
+  } else if( token.charAt(0) === '"' ){
+    //let b = new Stackobj( 'str', token );
+    let b = new Stackobj( 'str', oae_unquotestring(token) );
+    objectstack.push(b);
+  } else if( token.match(/^[a-zA-Z][a-zA-Z0-9_]*$/) !== null ){
+    oae_eval_cmd(token);
+  } else {
+    // 不正な入力 ...怖い
+    oaeconsolemsg_escape('不正なトークン: '+token);
+  }
+  return;
+}
+//%}}}
+// oae_unquotestring %{{{
+function oae_unquotestring(str){
+  'use strict';
+  let strout = '';
+  if( str.charAt(0) === '"' ){
+    // 文字列リテラル
+    let escapenext = false;
+    for( let i = 1; i < str.length; i ++ ){
+      if( escapenext ){
+        strout = strout + str.charAt(i);
+        escapenext = false;
+        continue;
+      }
+      if( str.charAt(i) === '\\' ) escapenext = true;
+      if( str.charAt(i) === '"' ){
+        break;
+      } else {
+        strout = strout + str.charAt(i);
+      }
+    }
+  }
+  return strout;
 }
 //%}}}
 // oae_eval_cmd %{{{
@@ -3071,8 +3253,12 @@ function oae_eval_cmd(str){
     oaepngoutput();
   } else if( str === 'saveaspzpr' ){
     oaepzproutput();
+  } else if( str === 'setcellsize' ){
+    oaesetcellsize();
+  } else if( str === 'setfileloadrc' ){
+    oae_setfileloadrc();
   } else {
-    oaeconsolemsg('未知のコマンドです');
+    oaeconsolemsg_escape('未知のコマンドです: '+str);
   }
   return;
 }
@@ -3089,12 +3275,39 @@ function oae_help(){
   str = str + "<br/> save : テキストファイルに保存";
   str = str + "<br/> saveaspng : PNGとして保存";
   str = str + "<br/> saveaspzpr : ぱずぷれファイルとして保存";
+  str = str + "<br/> 48 setcellsize : セルのサイズを指定";
+  str = str + "<br/> \"saveaspng\" setfileloadrc : ファイルロードRCスクリプトの設定";
   str = str + "<br/> debug : デバッグ（開発者用）";
   str = str + "<br/> debughist : デバッグ（開発者用）";
   oaeconsolemsg(str);
 }
 //%}}}
 
+// oae_setfileloadrc %{{{
+function oae_setfileloadrc(){
+  'use strict';
+  if( objectstack.length === 0 ) return;
+  let n = objectstack.length;
+  if( objectstack[n-1].type !== 'str' ) return;
+  fileloadrc = objectstack[n-1].value;
+  oaeconsolemsg("ファイルロードRCコマンドをセットしました");
+  objectstack.pop();
+}
+//%}}}
+// oaesetcellsize %{{{
+function oaesetcellsize(){
+  'use strict';
+  if( objectstack.length === 0 ) return;
+  let n = objectstack.length;
+  if( objectstack[n-1].type !== 'real' ) return;
+  let v = objectstack[n-1].value;
+  let cs = Math.round(v);
+  if( cs < 5 || cs > 100 ) return;
+  objectstack.pop();
+  cellunit = cs;
+  oaerewriteall();
+}
+//%}}}
 // oae_aviewflip %{{{
 function oae_aviewflip(){
   'use strict';
