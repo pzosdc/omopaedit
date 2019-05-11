@@ -1965,6 +1965,8 @@ function oaepzproutput_base(){
     str = tentaisho.pzprfileoutput();
   } else if( puzzletype === 'squlin' ){
     str = squlin.pzprfileoutput();
+  } else if( puzzletype === 'doublechoco' ){
+    str = doublechoco.pzprfileoutput();
   } else {
     return false;
   }
@@ -2029,7 +2031,7 @@ function oae_checkandfixpuzzletype(){
   'use strict';
   if( puzzletype.match(/^pencils$/) !== null ){
     puzzletype = 'pencils';
-  } else if( puzzletype === 'doublechoco' ){
+  } else if( puzzletype === 'doublechoco' || puzzletype === 'dbchoco' ){
     puzzletype = 'doublechoco';
   } else if( puzzletype === 'tentaisho' || puzzletype === 'tentaishow' ){
     puzzletype = 'tentaisho';
@@ -2143,6 +2145,7 @@ function oaefileinput_base(str){
   if( formatstr === 'pzprv3' ){
     if( puzzletype === 'tentaisho' ){ tentaisho.pzprfileinput();
     } else if( puzzletype === 'squlin' ){ squlin.pzprfileinput();
+    } else if( puzzletype === 'doublechoco' ){ doublechoco.pzprfileinput();
     } else {
       oaeconsolemsg('このパズルはぱずぷれ入力に対応していません');
       return false;

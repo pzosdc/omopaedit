@@ -91,6 +91,74 @@ keydown: function(n){
 },
 //%}}}
 
+// pzprfileinput %{{{
+pzprfileinput: function () {
+  'use strict';
+  doublechoco.pzprfileinput_qdatac();
+  oaefileinput_main_adatav();
+  oaefileinput_main_adatah();
+},
+//%}}}
+// pzprfileinput_qdatac %{{{
+pzprfileinput_qdatac: function () {
+  'use strict';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s+/);
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( words[ix-1] === '-' ){
+        qdatac[ix][iy] = 'c';
+      } else if( words[ix-1].match(/^-[0-9]*$/) !== null ){
+        qdatac[ix][iy] = 'c' + words[ix-1].substring(1);
+      } else if( words[ix-1] === '.' ){
+        qdatac[ix][iy] = '.';
+      } else if( words[ix-1].match(/^[0-9]*$/) !== null ){
+        qdatac[ix][iy] = '.' + words[ix-1];
+      }
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+
+// pzprfileoutput %{{{
+pzprfileoutput: function () {
+  'use strict';
+  let str;
+  str = 'pzprv3';
+  str = str + '\n' + 'dbchoco';
+  str = str + '\n' + ndivy.toString(10);
+  str = str + '\n' + ndivx.toString(10);
+  str = str + '\n';
+  str = str + doublechoco.pzprfileoutput_qdatac();
+  str = str + oaefileoutput_main_adatav();
+  str = str + oaefileoutput_main_adatah();
+  return str;
+},
+//%}}}
+// pzprfileoutput_qdatac %{{{
+pzprfileoutput_qdatac: function () {
+  'use strict';
+  let str = '';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( qdatac[ix][iy] === 'c' ){
+        str = str + ' -';
+      } else if( qdatac[ix][iy].match(/^c[0-9]*/) !== null ){
+        str = str + ' -' + qdatac[ix][iy].substring(1);
+      } else if( qdatac[ix][iy] === '.' ){
+        str = str + ' .';
+      } else if( qdatac[ix][iy].match(/^\.[0-9]*/) !== null ){
+        str = str + ' ' + qdatac[ix][iy].substring(1);
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+
 // shadetoggle %{{{
 shadetoggle: function (str) {
   'use strict';
