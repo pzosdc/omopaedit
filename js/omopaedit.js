@@ -232,7 +232,7 @@ function oaeerrmsg(obj){
 function oaeconsolemsg(str){
   'use strict';
   let obj = document.getElementById('oaeconsoleout');
-  if( typeof obj === 'undefined' ){
+  if( obj === null ){
     oaeerrmsg(str);
   } else {
     obj.innerHTML = str;
@@ -249,7 +249,7 @@ function oaeconsolemsg_escape(str){
   str = str.replace( /'/g, '&#039;');
   str = str.replace( /`/g, '&#x60;');
   let obj = document.getElementById('oaeconsoleout');
-  if( typeof obj === 'undefined' ){
+  if( obj === null ){
     oaeerrmsg(str);
   } else {
     obj.innerHTML = str;
@@ -260,7 +260,7 @@ function oaeconsolemsg_escape(str){
 function oaeconsoleclean(){
   'use strict';
   let obj = document.getElementById('oaeconsoleout');
-  if( typeof obj === 'undefined' ){
+  if( obj === null ){
   } else {
     obj.innerHTML = '';
   }
@@ -3305,6 +3305,7 @@ function oae_help(){
   str = 'コマンド一覧';
   str = str + "<br/> help : このメッセージを表示する";
   str = str + "<br/> check : 正解判定を行う";
+  str = str + "<br/> clevercheck : 正解判定を行う（高機能版）";
   str = str + "<br/> dup : 盤面の複製";
   str = str + "<br/> consoleclean : 出力コンソールエリアのクリア";
   str = str + "<br/> save : テキストファイルに保存";
