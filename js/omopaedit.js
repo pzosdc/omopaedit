@@ -2606,6 +2606,36 @@ function oaedrawui_cursor(targetcontext){
   oae_resetstyle(targetcontext);
 }
 //%}}}
+// oaedrawui_error %{{{
+function oaedrawui_error(targetcontext){
+  'use strict';
+  if( document.getElementById('oaeclevercheckui') === null ) return;
+  let errorlist;
+  if( puzzletype === 'pencils' ){
+    errorlist = pencils.clevercheck_main();
+  } else {
+    return;
+  }
+  targetcontext.fillStyle = 'rgb( 255, 0, 0 )';
+  targetcontext.globalAlpha = 0.5;
+  let pf = Math.floor(gridlinewidth * cellunit) % 2 === 1 ? 0.5 : 0;
+  let l = leftmargin;
+  let t = topmargin;
+  let cu = cellunit;
+  for ( let ic = 0; ic < errorlist.cell.length; ic ++ ) {
+    let ix = errorlist.cell[ic][0];
+    let iy = errorlist.cell[ic][1];
+    targetcontext.moveTo( pf+ l + (ix  ) * cu, pf+ t + (ndivy-iy  ) * cu );
+    targetcontext.lineTo( pf+ l + (ix-1) * cu, pf+ t + (ndivy-iy  ) * cu );
+    targetcontext.lineTo( pf+ l + (ix-1) * cu, pf+ t + (ndivy-iy+1) * cu );
+    targetcontext.lineTo( pf+ l + (ix  ) * cu, pf+ t + (ndivy-iy+1) * cu );
+    targetcontext.closePath();
+    targetcontext.fill();
+    targetcontext.beginPath();
+  }
+  oae_resetstyle(targetcontext);
+}
+//%}}}
 
 // oaedrawgrid %{{{
 function oaedrawgrid(){
@@ -3240,6 +3270,8 @@ function oae_eval_cmd(str){
   'use strict';
   if( str === 'check' ){
     oae_check();
+  } else if( str === 'clevercheck' ){
+    oae_clevercheck();
   } else if( str === 'help' ){
     oae_help();
   } else if( str === 'debug' ){
@@ -3470,6 +3502,23 @@ function oae_check(){
     midloop.check();
   } else if( puzzletype === 'squlin' ){
     squlin.check();
+  } else {
+    oaeconsolemsg('未実装です');
+  }
+  return;
+}
+//%}}}
+// oae_clevercheck %{{{
+function oae_clevercheck(){
+  'use strict';
+  // clevercheck のモチベーションは複数のエラー項目を個別に管理することにある
+  // バリアントパズルや、作りかけのパズルに対して効果を発揮する
+  if( puzzletype === 'pencils' ){
+    pencils.clevercheck();
+  //} else if( puzzletype === 'doublechoco' ){
+  //} else if( puzzletype === 'tentaisho' ){
+  //} else if( puzzletype === 'midloop' ){
+  //} else if( puzzletype === 'squlin' ){
   } else {
     oaeconsolemsg('未実装です');
   }

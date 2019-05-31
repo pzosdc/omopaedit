@@ -127,6 +127,15 @@ body {
   padding-right: 4px;
   background: linear-gradient(0deg, #ddd, #fff);
 }
+.clevercheckbutton {
+  font-size: 90%;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  margin-right: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
+  background: linear-gradient(0deg, #ddd, #fff);
+}
 #oaedisplayoption {
   margin-top: 6px;
 }
