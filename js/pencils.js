@@ -8,6 +8,26 @@ core: {
   left: '3',
   right: '4'
 },
+clevercheckconditlist : [
+  { tag: 'syntax_error'        , msg: '不正な文法                      '},
+  { tag: 'core_on_jiku'        , msg: '軸と芯の重複                    '},
+  { tag: 'line_on_jiku'        , msg: '軸と線の重複                    '},
+  { tag: 'isolate_core'        , msg: '軸とも線ともつながらない芯      '},
+  { tag: 'isolate_line'        , msg: '芯とつながっていない線          '},
+  { tag: 'isolate_jiku'        , msg: '芯とつながっていない軸          '},
+  { tag: 'share_line'          , msg: '複数の芯とつながる線            '},
+  { tag: 'share_jiku'          , msg: '複数の芯とつながる軸            '},
+  { tag: 'split_line'          , msg: '枝分かれしている線              '},
+  { tag: 'split_jiku'          , msg: '枝分かれしている軸              '},
+  { tag: 'loop_line'           , msg: 'ループしている線                '},
+  { tag: 'loop_jiku'           , msg: 'ループしている軸                '},
+  { tag: 'curve_jiku'          , msg: '曲っている軸                    '},
+  { tag: 'unequal_length_core' , msg: '芯から出る軸と線の長さの不一致  '},
+  { tag: 'false_number'        , msg: '数が正しい長さの軸になっていない'},
+  { tag: 'empty_cell'          , msg: '軸でも線でもないマス            '},
+  { tag: 'nowall_jiku'         , msg: '軸マスと非軸マスの間に壁がない  '},
+  { tag: 'isolate_wall'        , msg: '非軸マスと非軸マスの間に壁がある'}
+],
 // init %{{{
 init: function () {
   'use strict';
@@ -725,6 +745,697 @@ hasacceptableanswer: function () {
     }
   }
   return [true,{}];
+},
+//%}}}
+
+// -------------------------
+// clevercheck %{{{
+clevercheck: function () {
+  'use strict';
+  pencils.clevercheckui_prep();
+  oae_clearcanvas(ovcontext);
+  oaedrawui_error(ovcontext);
+  oae_resetstyle(ovcontext);
+  return;
+},
+//%}}}
+// clevercheckui_prep %{{{
+clevercheckui_prep: function () {
+  'use strict';
+  let obj = document.getElementById('oaeclevercheckui');
+  if( obj === null ){
+    let place = document.getElementById('oaeconsolearea');
+    let ele = document.createElement('div');
+    ele.id = 'oaeclevercheckui';
+    place.insertBefore(ele,place.childNodes[0]);
+    let htmlstr = '';
+    htmlstr = htmlstr + '<div>';
+    //htmlstr = htmlstr + '<a class="clevercheckbutton" id="clevercheck_selectall">全選択</a> ';
+    //htmlstr = htmlstr + '<a class="clevercheckbutton" id="clevercheck_unselectall">全解除</a> ';
+    htmlstr = htmlstr + '<a class="clevercheckbutton" id="clevercheck_recheck">再チェック</a> ';
+    htmlstr = htmlstr + '<a class="clevercheckbutton" id="clevercheck_closeui">閉じる</a> ';
+    htmlstr = htmlstr + '</div>';
+    htmlstr = htmlstr + '<form>';
+    for( let i = 0; i < pencils.clevercheckconditlist.length; i ++ ){
+      htmlstr = htmlstr +
+      '<input type="checkbox" id="clevercheck_' +
+      pencils.clevercheckconditlist[i].tag +
+      '" checked /><label for="clevercheck_' +
+      pencils.clevercheckconditlist[i].tag +
+      '" id="clevercheck_label_' +
+      pencils.clevercheckconditlist[i].tag +
+      '">' +
+      pencils.clevercheckconditlist[i].msg +
+      '</label><br/>';
+    }
+    htmlstr = htmlstr + '</form>';
+    obj = document.getElementById('oaeclevercheckui');
+    obj.innerHTML = htmlstr;
+    document.getElementById('clevercheck_recheck').onclick = function(){
+      pencils.clevercheck();
+    };
+    document.getElementById('clevercheck_closeui').onclick = function(){
+      let par = document.getElementById('oaeconsolearea');
+      let chi = document.getElementById('oaeclevercheckui');
+      par.removeChild(chi);
+    };
+  }
+  return obj;
+},
+//%}}}
+// clevercheck_main %{{{
+clevercheck_main: function () {
+  'use strict';
+  // 色がついているマスを軸マスと判定
+  // 中線が引かれたマスを線マスと判定
+  // 軸マスは、壁によって分断されているものとみなす
+  // 線に枝分かれがある場合は合計長さを長さとする
+  // 軸に枝分かれがある場合は面積を長さとする
+  let errorlist = [
+    pencils.clevercheck_syntax_error(),
+    pencils.clevercheck_core_on_jiku(),
+    pencils.clevercheck_line_on_jiku(),
+    pencils.clevercheck_isolate_core(),
+    pencils.clevercheck_isolate_line(),
+    pencils.clevercheck_isolate_jiku(),
+    pencils.clevercheck_share_line(),
+    pencils.clevercheck_share_jiku(),
+    pencils.clevercheck_split_line(),
+    pencils.clevercheck_split_jiku(),
+    pencils.clevercheck_loop_line(),
+    pencils.clevercheck_loop_jiku(),
+    pencils.clevercheck_curve_jiku(),
+    pencils.clevercheck_unequal_length_core(),
+    pencils.clevercheck_false_number(),
+    pencils.clevercheck_empty_cell(),
+    pencils.clevercheck_nowall_jiku(),
+    pencils.clevercheck_isolate_wall()
+  ];
+  let celllist = [];
+  celllist.isinarr = function(ix,iy) {
+    for( let i = 0; i < this.length; i ++ ){
+      if( this[i][0] === ix && this[i][1] === iy ) return true;
+    }
+    return false;
+  };
+  for( let i = 0; i < errorlist.length; i ++ ){
+    let tag = pencils.clevercheckconditlist[i].tag;
+    let checkedflag = document.getElementById( 'clevercheck_' + tag ).checked;
+    let colortag = '#ccc;';
+    if( checkedflag && errorlist[i].length > 0 ){
+      colortag = '#600';
+    }
+    document.getElementById( 'clevercheck_label_' + tag ).innerHTML =
+    '<span style="color:' + colortag + '">' +
+    pencils.clevercheckconditlist[i].msg + ' (該当' + errorlist[i].length.toString(10) + '件)' +
+    '</span>';
+    if( checkedflag ){
+      let l = errorlist[i];
+      for( let j = 0; j < l.length; j ++ ){
+        let cx = l[j][0];
+        let cy = l[j][1];
+        if( ! celllist.isinarr(cx,cy) ) celllist.push([cx,cy]);
+      }
+    }
+  }
+  delete celllist.isinarr;
+  return {cell:celllist};
+},
+//%}}}
+// clevercheck_syntax_error %{{{
+clevercheck_syntax_error: function () {
+  'use strict';
+  let l = [];
+  // [TODO]
+  return l;
+},
+//%}}}
+// clevercheck_core_on_jiku %{{{
+clevercheck_core_on_jiku: function () {
+  'use strict';
+  let l = [];
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      if( adatac[ix][iy] !== '=' ) continue;
+      if( qdatac[ix][iy].match(/^[1-4]/) !== null ){
+        l.push([ix,iy]);
+      }
+    }
+  }
+  return l;
+},
+//%}}}
+// clevercheck_line_on_jiku %{{{
+clevercheck_line_on_jiku: function () {
+  'use strict';
+  let l = [];
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      if( adatac[ix][iy] !== '=' ) continue;
+      if( adatav[ix][iy] === '-1' ||
+      adatav[ix-1][iy] === '-1' ||
+      adatah[ix][iy] === '-1' ||
+      adatah[ix][iy-1] === '-1' ){
+        l.push([ix,iy]);
+      }
+    }
+  }
+  return l;
+},
+//%}}}
+// clevercheck_isolate_core %{{{
+clevercheck_isolate_core: function () {
+  'use strict';
+  let l = [];
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      let dir;
+      if( qdatac[ix][iy].match(/^[1-4]/) !== null ){
+        dir = qdatac[ix][iy];
+      } else if( adatac[ix][iy].match(/^[1-4]/) !== null ){
+        dir = adatac[ix][iy];
+      } else {
+        continue;
+      }
+      let jx = ix;
+      let jy = iy;
+      if( dir === pencils.core.up ) jy --;
+      if( dir === pencils.core.down ) jy ++;
+      if( dir === pencils.core.right ) jx --;
+      if( dir === pencils.core.left ) jx ++;
+      let linearr = pencils.clevercheck_getline(ix,iy);
+      let jikuarr = pencils.clevercheck_getjiku(jx,jy);
+      if( linearr.length === 0 && jikuarr.length === 0 ) l.push([ix,iy]);
+    }
+  }
+  return l;
+},
+//%}}}
+// clevercheck_isolate_line %{{{
+clevercheck_isolate_line: function () {
+  'use strict';
+  let l = [];
+  let alreadysearched = [];
+  alreadysearched.isinarr = function(ix,iy) {
+    for( let i = 0; i < this.length; i ++ ){
+      if( this[i][0] === ix && this[i][1] === iy ) return true;
+    }
+    return false;
+  };
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      if( alreadysearched.isinarr(ix,iy) ) continue;
+      let linearr = pencils.clevercheck_getline(ix,iy);
+      if( linearr.length === 0 ) continue;
+      let cellarr = pencils.clevercheck_getlinecell(linearr);
+      let corefound = false;
+      for( let ic = 0; ic < cellarr.length; ic ++ ){
+        let cx = cellarr[ic][0];
+        let cy = cellarr[ic][1];
+        if( qdatac[cx][cy].match(/^[1-4]/) !== null ){ corefound = true; break;}
+        if( adatac[cx][cy].match(/^[1-4]/) !== null ){ corefound = true; break;}
+      }
+      for( let ic = 0; ic < cellarr.length; ic ++ ){
+        let cx = cellarr[ic][0];
+        let cy = cellarr[ic][1];
+        alreadysearched.push([cx,cy]);
+        if( ! corefound ) l.push([cx,cy]);
+      }
+    }
+  }
+  delete l.isinarr;
+  return l;
+},
+//%}}}
+// clevercheck_isolate_jiku %{{{
+clevercheck_isolate_jiku: function () {
+  'use strict';
+  let l = [];
+  let alreadysearched = [];
+  alreadysearched.isinarr = function(ix,iy) {
+    for( let i = 0; i < this.length; i ++ ){
+      if( this[i][0] === ix && this[i][1] === iy ) return true;
+    }
+    return false;
+  };
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      if( adatac[ix][iy] !== '=' ) continue;
+      if( alreadysearched.isinarr(ix,iy) ) continue;
+      let currentjiku = pencils.clevercheck_getjiku(ix,iy);
+      let corefound = false;
+      for( let ic = 0; ic < currentjiku.length; ic ++ ){
+        let cx = currentjiku[ic][0];
+        let cy = currentjiku[ic][1];
+        if( qdatac[cx+1][cy] === pencils.core.right ){ corefound = true; break; }
+        if( qdatac[cx-1][cy] === pencils.core.left  ){ corefound = true; break; }
+        if( qdatac[cx][cy+1] === pencils.core.up    ){ corefound = true; break; }
+        if( qdatac[cx][cy-1] === pencils.core.down  ){ corefound = true; break; }
+        if( adatac[cx+1][cy] === pencils.core.right ){ corefound = true; break; }
+        if( adatac[cx-1][cy] === pencils.core.left  ){ corefound = true; break; }
+        if( adatac[cx][cy+1] === pencils.core.up    ){ corefound = true; break; }
+        if( adatac[cx][cy-1] === pencils.core.down  ){ corefound = true; break; }
+      }
+      for( let ic = 0; ic < currentjiku.length; ic ++ ){
+        alreadysearched.push(currentjiku[ic]);
+        if( ! corefound ) l.push(currentjiku[ic]);
+      }
+    }
+  }
+  return l;
+},
+//%}}}
+// clevercheck_share_line %{{{
+clevercheck_share_line: function () {
+  'use strict';
+  let l = [];
+  let alreadysearched = [];
+  alreadysearched.isinarr = function(ix,iy) {
+    for( let i = 0; i < this.length; i ++ ){
+      if( this[i][0] === ix && this[i][1] === iy ) return true;
+    }
+    return false;
+  };
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      if( alreadysearched.isinarr(ix,iy) ) continue;
+      let linearr = pencils.clevercheck_getline(ix,iy);
+      if( linearr.length === 0 ) continue;
+      let cellarr = pencils.clevercheck_getlinecell(linearr);
+      let corefound = 0;
+      for( let ic = 0; ic < cellarr.length; ic ++ ){
+        let cx = cellarr[ic][0];
+        let cy = cellarr[ic][1];
+        if( qdatac[cx][cy].match(/^[1-4]/) !== null ) corefound ++;
+        if( adatac[cx][cy].match(/^[1-4]/) !== null ) corefound ++;
+      }
+      for( let ic = 0; ic < cellarr.length; ic ++ ){
+        let cx = cellarr[ic][0];
+        let cy = cellarr[ic][1];
+        alreadysearched.push([cx,cy]);
+        if( corefound >= 2 ) l.push([cx,cy]);
+      }
+    }
+  }
+  delete l.isinarr;
+  return l;
+},
+//%}}}
+// clevercheck_share_jiku %{{{
+clevercheck_share_jiku: function () {
+  'use strict';
+  let l = [];
+  let alreadysearched = [];
+  alreadysearched.isinarr = function(ix,iy) {
+    for( let i = 0; i < this.length; i ++ ){
+      if( this[i][0] === ix && this[i][1] === iy ) return true;
+    }
+    return false;
+  };
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      if( adatac[ix][iy] !== '=' ) continue;
+      if( alreadysearched.isinarr(ix,iy) ) continue;
+      let currentjiku = pencils.clevercheck_getjiku(ix,iy);
+      let corefound = 0;
+      for( let ic = 0; ic < currentjiku.length; ic ++ ){
+        let cx = currentjiku[ic][0];
+        let cy = currentjiku[ic][1];
+        if( qdatac[cx+1][cy] === pencils.core.right ){ corefound ++; }
+        if( qdatac[cx-1][cy] === pencils.core.left  ){ corefound ++; }
+        if( qdatac[cx][cy+1] === pencils.core.up    ){ corefound ++; }
+        if( qdatac[cx][cy-1] === pencils.core.down  ){ corefound ++; }
+        if( adatac[cx+1][cy] === pencils.core.right ){ corefound ++; }
+        if( adatac[cx-1][cy] === pencils.core.left  ){ corefound ++; }
+        if( adatac[cx][cy+1] === pencils.core.up    ){ corefound ++; }
+        if( adatac[cx][cy-1] === pencils.core.down  ){ corefound ++; }
+      }
+      for( let ic = 0; ic < currentjiku.length; ic ++ ){
+        alreadysearched.push(currentjiku[ic]);
+        if( corefound >= 2 ) l.push(currentjiku[ic]);
+      }
+    }
+  }
+  return l;
+},
+//%}}}
+// clevercheck_split_line %{{{
+clevercheck_split_line: function () {
+  'use strict';
+  let l = [];
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      let freedirnum = 0;
+      if( adatav[ix  ][iy] === '-1' ) freedirnum ++;
+      if( adatav[ix-1][iy] === '-1' ) freedirnum ++;
+      if( adatah[ix][iy  ] === '-1' ) freedirnum ++;
+      if( adatah[ix][iy-1] === '-1' ) freedirnum ++;
+      if( freedirnum === 3 || freedirnum === 4 ) l.push([ix,iy]);
+    }
+  }
+  return l;
+},
+//%}}}
+// clevercheck_split_jiku %{{{
+clevercheck_split_jiku: function () {
+  'use strict';
+  let l = [];
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      if( adatac[ix][iy] !== '=' ) continue;
+      let freedirnum = 0;
+      if( adatac[ix+1][iy] === '=' && adatav[ix  ][iy] !== '1' ) freedirnum ++;
+      if( adatac[ix-1][iy] === '=' && adatav[ix-1][iy] !== '1' ) freedirnum ++;
+      if( adatac[ix][iy+1] === '=' && adatah[ix][iy  ] !== '1' ) freedirnum ++;
+      if( adatac[ix][iy-1] === '=' && adatah[ix][iy-1] !== '1' ) freedirnum ++;
+      if( freedirnum === 3 || freedirnum === 4 ) l.push([ix,iy]);
+    }
+  }
+  return l;
+},
+//%}}}
+// clevercheck_loop_line %{{{
+clevercheck_loop_line: function () {
+  'use strict';
+  let l = [];
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      let loopfound = pencils.clevercheck_haslineloop(ix,iy);
+      if( loopfound ) l.push([ix,iy]);
+    }
+  }
+  return l;
+},
+//%}}}
+// clevercheck_loop_jiku %{{{
+clevercheck_loop_jiku: function () {
+  'use strict';
+  let l = [];
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      let loopfound = pencils.clevercheck_hasjikuloop(ix,iy);
+      if( loopfound ) l.push([ix,iy]);
+    }
+  }
+  return l;
+},
+//%}}}
+// clevercheck_curve_jiku %{{{
+clevercheck_curve_jiku: function () {
+  'use strict';
+  let l = [];
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      if( adatac[ix][iy] !== '=' ) continue;
+      let vnum = 0;
+      let hnum = 0;
+      if( adatac[ix+1][iy] === '=' && adatav[ix  ][iy] !== '1' ) vnum ++;
+      if( adatac[ix-1][iy] === '=' && adatav[ix-1][iy] !== '1' ) vnum ++;
+      if( adatac[ix][iy+1] === '=' && adatah[ix][iy  ] !== '1' ) hnum ++;
+      if( adatac[ix][iy-1] === '=' && adatah[ix][iy-1] !== '1' ) hnum ++;
+      if( vnum !== 0 && hnum !== 0 ) l.push([ix,iy]);
+    }
+  }
+  return l;
+},
+//%}}}
+// clevercheck_unequal_length_core %{{{
+clevercheck_unequal_length_core: function () {
+  'use strict';
+  let l = [];
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      let dir;
+      if( qdatac[ix][iy].match(/^[1-4]/) !== null ){
+        dir = qdatac[ix][iy];
+      } else if( adatac[ix][iy].match(/^[1-4]/) !== null ){
+        dir = adatac[ix][iy];
+      } else {
+        continue;
+      }
+      let jx = ix;
+      let jy = iy;
+      if( dir === pencils.core.up ) jy --;
+      if( dir === pencils.core.down ) jy ++;
+      if( dir === pencils.core.right ) jx --;
+      if( dir === pencils.core.left ) jx ++;
+      let linearr = pencils.clevercheck_getline(ix,iy);
+      let jikuarr = pencils.clevercheck_getjiku(jx,jy);
+      if( linearr.length !== jikuarr.length ) l.push([ix,iy]);
+    }
+  }
+  return l;
+},
+//%}}}
+// clevercheck_false_number %{{{
+clevercheck_false_number: function () {
+  'use strict';
+  let l = [];
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      if( qdatac[ix][iy] === 'o' ){
+        if( adatac[ix][iy] !== '=' ) l.push([ix,iy]);
+        continue;
+      }
+      if( qdatac[ix][iy].match(/^o[0-9]+/) === null ) continue;
+      if( adatac[ix][iy] !== '=' ){
+        l.push([ix,iy]);
+        continue;
+      }
+      let num = parseInt(qdatac[ix][iy].substring(1),10);
+      let jikuarr = pencils.clevercheck_getjiku(ix,iy);
+      if( num !== jikuarr.length ) l.push([ix,iy]);
+    }
+  }
+  return l;
+},
+//%}}}
+// clevercheck_empty_cell %{{{
+clevercheck_empty_cell: function () {
+  'use strict';
+  let l = [];
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      if( adatac[ix][iy] === '=' ) continue;
+      if( adatav[ix  ][iy] === '-1' ) continue;
+      if( adatav[ix-1][iy] === '-1' ) continue;
+      if( adatah[ix][iy  ] === '-1' ) continue;
+      if( adatah[ix][iy-1] === '-1' ) continue;
+      // 長さ０の鉛筆から長さ０の線が出ているマスは空マスとみなすことに注意
+      l.push([ix,iy]);
+    }
+  }
+  return l;
+},
+//%}}}
+// clevercheck_nowall_jiku %{{{
+clevercheck_nowall_jiku: function () {
+  'use strict';
+  let l = [];
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      if( adatac[ix][iy] !== '=' ) continue;
+      if( ix !== ndivx && adatac[ix+1][iy] !== '=' && adatav[ix][iy] !== '1' && qdatac[ix+1][iy] !== pencils.core.right && adatac[ix+1][iy] !== pencils.core.right ) l.push([ix,iy]);
+      else if( ix !== 1 && adatac[ix-1][iy] !== '=' && adatav[ix-1][iy] !== '1' && qdatac[ix-1][iy] !== pencils.core.left && adatac[ix-1][iy] !== pencils.core.left ) l.push([ix,iy]);
+      else if( iy !== ndivy && adatac[ix][iy+1] !== '=' && adatah[ix][iy] !== '1' && qdatac[ix][iy+1] !== pencils.core.up && adatac[ix][iy+1] !== pencils.core.up ) l.push([ix,iy]);
+      else if( iy !== 1 && adatac[ix][iy-1] !== '=' && adatah[ix][iy-1] !== '1' && qdatac[ix][iy-1] !== pencils.core.down && adatac[ix][iy-1] !== pencils.core.down ) l.push([ix,iy]);
+    }
+  }
+  return l;
+},
+//%}}}
+// clevercheck_isolate_wall %{{{
+clevercheck_isolate_wall: function () {
+  'use strict';
+  let l = [];
+  for( let ix = 1; ix <= ndivx; ix ++ ){
+    for( let iy = 1; iy <= ndivy; iy ++ ){
+      if( adatac[ix][iy] === '=' ) continue;
+      if( adatac[ix+1][iy] !== '=' && adatav[ix][iy] === '1' ) l.push([ix,iy]);
+      else if( adatac[ix-1][iy] !== '=' && adatav[ix-1][iy] === '1' ) l.push([ix,iy]);
+      else if( adatac[ix][iy+1] !== '=' && adatah[ix][iy] === '1' ) l.push([ix,iy]);
+      else if( adatac[ix][iy-1] !== '=' && adatah[ix][iy-1] === '1' ) l.push([ix,iy]);
+    }
+  }
+  return l;
+},
+//%}}}
+// clevercheck_getjiku %{{{
+clevercheck_getjiku: function (xin,yin) {
+  'use strict';
+  if( adatac[xin][yin] !== '=' ) return [];
+  let l = [];
+  l.isinarr = function(ix,iy) {
+    for( let i = 0; i < this.length; i ++ ){
+      if( this[i][0] === ix && this[i][1] === iy ) return true;
+    }
+    return false;
+  };
+  l.push([xin,yin]);
+  for( let i = 0; i < ndivx*ndivy; i ++ ){
+    if( i >= l.length ) break;
+    let cx = l[i][0];
+    let cy = l[i][1];
+    if( adatac[cx+1][cy] === '=' && adatav[cx  ][cy] !== '1' && ! l.isinarr(cx+1,cy) ) l.push([cx+1,cy]);
+    if( adatac[cx-1][cy] === '=' && adatav[cx-1][cy] !== '1' && ! l.isinarr(cx-1,cy) ) l.push([cx-1,cy]);
+    if( adatac[cx][cy+1] === '=' && adatah[cx][cy  ] !== '1' && ! l.isinarr(cx,cy+1) ) l.push([cx,cy+1]);
+    if( adatac[cx][cy-1] === '=' && adatah[cx][cy-1] !== '1' && ! l.isinarr(cx,cy-1) ) l.push([cx,cy-1]);
+  }
+  delete l.isinarr;
+  return l;
+},
+//%}}}
+// clevercheck_getline %{{{
+clevercheck_getline: function (xin,yin) {
+  'use strict';
+  let l = [];
+  l.isinarr = function(is,ix,iy) {
+    for( let i = 0; i < this.length; i ++ ){
+      if( this[i][0] === is && this[i][1] === ix && this[i][2] === iy ) return true;
+    }
+    return false;
+  };
+  let c = [];
+  c.push([xin,yin]);
+  if( adatav[xin  ][yin] === '-1' ){ l.push(['v',xin  ,yin]); c.push([xin+1,yin]); }
+  if( adatav[xin-1][yin] === '-1' ){ l.push(['v',xin-1,yin]); c.push([xin-1,yin]); }
+  if( adatah[xin][yin  ] === '-1' ){ l.push(['h',xin,yin  ]); c.push([xin,yin+1]); }
+  if( adatah[xin][yin-1] === '-1' ){ l.push(['h',xin,yin-1]); c.push([xin,yin-1]); }
+  for( let i = 0; i < ndivx*ndivy; i ++ ){
+    if( i >= c.length ) break;
+    let cx = c[i][0];
+    let cy = c[i][1];
+    if( adatav[cx  ][cy] === '-1' && ! l.isinarr('v',cx  ,cy) ){ l.push(['v',cx  ,cy]); c.push([cx+1,cy]); }
+    if( adatav[cx-1][cy] === '-1' && ! l.isinarr('v',cx-1,cy) ){ l.push(['v',cx-1,cy]); c.push([cx-1,cy]); }
+    if( adatah[cx][cy  ] === '-1' && ! l.isinarr('h',cx,cy  ) ){ l.push(['h',cx,cy  ]); c.push([cx,cy+1]); }
+    if( adatah[cx][cy-1] === '-1' && ! l.isinarr('h',cx,cy-1) ){ l.push(['h',cx,cy-1]); c.push([cx,cy-1]); }
+  }
+  delete l.isinarr;
+  return l;
+},
+//%}}}
+// clevercheck_getlinecell %{{{
+clevercheck_getlinecell: function (arrin) {
+  'use strict';
+  let l = [];
+  l.isinarr = function(ix,iy) {
+    for( let i = 0; i < this.length; i ++ ){
+      if( this[i][0] === ix && this[i][1] === iy ) return true;
+    }
+    return false;
+  };
+  for( let i = 0; i < arrin.length; i ++ ){
+    let cx = arrin[i][1];
+    let cy = arrin[i][2];
+    if( ! l.isinarr(cx,cy) ) l.push([cx,cy]);
+    if( arrin[i][0] === 'v' && ! l.isinarr(cx+1,cy) ) l.push([cx+1,cy]);
+    if( arrin[i][0] === 'h' && ! l.isinarr(cx,cy+1) ) l.push([cx,cy+1]);
+  }
+  delete l.isinarr;
+  return l;
+},
+//%}}}
+// clevercheck_haslineloop %{{{
+clevercheck_haslineloop: function (xin,yin) {
+  'use strict';
+  for( let idir = 0; idir < 4; idir ++ ){
+    let l = [];
+    l.isinarr = function(is,ix,iy) {
+      for( let i = 0; i < this.length; i ++ ){
+        if( this[i][0] === is && this[i][1] === ix && this[i][2] === iy ) return true;
+      }
+      return false;
+    };
+    let c = [];
+    // 始点から唯一の道を選び、その方向に進んだ時に始点に戻るかどうかを調べる
+    c.push([xin,yin]);
+    if( idir === 0 && adatav[xin  ][yin] === '-1' ){ l.push(['v',xin  ,yin]); c.push([xin+1,yin]); }
+    if( idir === 1 && adatav[xin-1][yin] === '-1' ){ l.push(['v',xin-1,yin]); c.push([xin-1,yin]); }
+    if( idir === 2 && adatah[xin][yin  ] === '-1' ){ l.push(['h',xin,yin  ]); c.push([xin,yin+1]); }
+    if( idir === 3 && adatah[xin][yin-1] === '-1' ){ l.push(['h',xin,yin-1]); c.push([xin,yin-1]); }
+    if( l.length !== 1 ) continue;
+    for( let i = 1; i < ndivx*ndivy; i ++ ){
+      if( i >= c.length ) break;
+      let cx = c[i][0];
+      let cy = c[i][1];
+      if( adatav[cx  ][cy] === '-1' && ! l.isinarr('v',cx  ,cy) ){
+        l.push(['v',cx  ,cy]); c.push([cx+1,cy]);
+        if( xin === cx+1 && yin === cy ) return true;
+      }
+      if( adatav[cx-1][cy] === '-1' && ! l.isinarr('v',cx-1,cy) ){
+        l.push(['v',cx-1,cy]); c.push([cx-1,cy]);
+        if( xin === cx-1 && yin === cy ) return true;
+      }
+      if( adatah[cx][cy  ] === '-1' && ! l.isinarr('h',cx,cy  ) ){
+        l.push(['h',cx,cy  ]); c.push([cx,cy+1]);
+        if( xin === cx && yin === cy+1 ) return true;
+      }
+      if( adatah[cx][cy-1] === '-1' && ! l.isinarr('h',cx,cy-1) ){
+        l.push(['h',cx,cy-1]); c.push([cx,cy-1]);
+        if( xin === cx && yin === cy-1 ) return true;
+      }
+    }
+  }
+  return false;
+},
+//%}}}
+// clevercheck_hasjikuloop %{{{
+clevercheck_hasjikuloop: function (xin,yin) {
+  'use strict';
+  if( adatac[xin][yin] !== '=' ) return false;
+  for( let idir = 0; idir < 4; idir ++ ){
+    let l = [];
+    l.isinarr = function(is,ix,iy) {
+      for( let i = 0; i < this.length; i ++ ){
+        if( this[i][0] === is && this[i][1] === ix && this[i][2] === iy ) return true;
+      }
+      return false;
+    };
+    let c = [];
+    c.isinarr = function(ix,iy) {
+      for( let i = 0; i < this.length; i ++ ){
+        if( this[i][0] === ix && this[i][1] === iy ) return true;
+      }
+      return false;
+    };
+    // 始点から唯一の道を選び、その方向に進んだ時に始点に戻るかどうかを調べる
+    c.push([xin,yin]);
+    if( idir === 0 && adatac[xin+1][yin] === '=' && adatav[xin  ][yin] !== '1' ){ l.push(['v',xin  ,yin]); c.push([xin+1,yin]); }
+    if( idir === 1 && adatac[xin-1][yin] === '=' && adatav[xin-1][yin] !== '1' ){ l.push(['v',xin-1,yin]); c.push([xin-1,yin]); }
+    if( idir === 2 && adatac[xin][yin+1] === '=' && adatah[xin][yin  ] !== '1' ){ l.push(['h',xin,yin  ]); c.push([xin,yin+1]); }
+    if( idir === 3 && adatac[xin][yin-1] === '=' && adatah[xin][yin-1] !== '1' ){ l.push(['h',xin,yin-1]); c.push([xin,yin-1]); }
+    if( l.length !== 1 ) continue;
+    for( let i = 1; i < ndivx*ndivy; i ++ ){
+      if( i >= c.length ) break;
+      let cx = c[i][0];
+      let cy = c[i][1];
+      if( adatac[cx+1][cy] === '=' && adatav[cx  ][cy] !== '1' && ! l.isinarr('v',cx  ,cy) ){
+        l.push(['v',cx  ,cy]); c.push([cx+1,cy]);
+        if( xin === cx+1 && yin === cy ) return true;
+      }
+      if( adatac[cx-1][cy] === '=' && adatav[cx-1][cy] !== '1' && ! l.isinarr('v',cx-1,cy) ){
+        l.push(['v',cx-1,cy]); c.push([cx-1,cy]);
+        if( xin === cx-1 && yin === cy ) return true;
+      }
+      if( adatac[cx][cy+1] === '=' && adatah[cx][cy  ] !== '1' && ! l.isinarr('h',cx,cy  ) ){
+        l.push(['h',cx,cy  ]); c.push([cx,cy+1]);
+        if( xin === cx && yin === cy+1 ) return true;
+      }
+      if( adatac[cx][cy-1] === '=' && adatah[cx][cy-1] !== '1' && ! l.isinarr('h',cx,cy-1) ){
+        l.push(['h',cx,cy-1]); c.push([cx,cy-1]);
+        if( xin === cx && yin === cy-1 ) return true;
+      }
+    }
+  }
+  return false;
+},
+//%}}}
+// -------------------------
+
+// nop %{{{
+nop: function () {
+  'use strict';
+  return;
 }
 //%}}}
 };

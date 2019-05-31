@@ -17,13 +17,13 @@ function tog(var1){
 --><!--
 --></span><!--
 --><div class="RDLtitle"><!--
--->omopaedit version 1.6 簡易マニュアル<!--
+-->omopaedit version 1.7 簡易マニュアル<!--
 --></div><!--
 --><div class="RDLauthor"><!--
 -->pzdc<!--
 --></div><!--
 --><div class="RDLdate"><!--
--->2019, May. 11<!--
+-->2019, Jun. 1<!--
 --></div><!--
 --><!--
 --></span><!--
@@ -1307,7 +1307,7 @@ function tog(var1){
 --></div><!--
 --><div class="RDLLC" id="RDLLC062"><!--
 --><span><!--
--->正解判定<!--
+-->正解判定を行う<!--
 --></span><!--
 --></div><!--
 --><span><!--
@@ -1315,12 +1315,12 @@ function tog(var1){
 --></span><!--
 --><div class="RDLLH" id="RDLLH063"><!--
 --><span><!--
---><span class="RDLfI">dup</span><span><!--
+--><span class="RDLfI">clevercheck</span><span><!--
 --></span><!--
 --></div><!--
 --><div class="RDLLC" id="RDLLC063"><!--
 --><span><!--
--->現在盤面の複製<!--
+-->正解判定を行う（高機能版）<!--
 --></span><!--
 --></div><!--
 --><span><!--
@@ -1328,12 +1328,12 @@ function tog(var1){
 --></span><!--
 --><div class="RDLLH" id="RDLLH064"><!--
 --><span><!--
---><span class="RDLfI">consoleclean</span><span><!--
+--><span class="RDLfI">dup</span><span><!--
 --></span><!--
 --></div><!--
 --><div class="RDLLC" id="RDLLC064"><!--
 --><span><!--
--->出力コンソールエリアのクリア<!--
+-->現在盤面の複製<!--
 --></span><!--
 --></div><!--
 --><span><!--
@@ -1341,12 +1341,12 @@ function tog(var1){
 --></span><!--
 --><div class="RDLLH" id="RDLLH065"><!--
 --><span><!--
---><span class="RDLfI">save</span><span><!--
+--><span class="RDLfI">consoleclean</span><span><!--
 --></span><!--
 --></div><!--
 --><div class="RDLLC" id="RDLLC065"><!--
 --><span><!--
--->テキストファイルに保存<!--
+-->出力コンソールエリアのクリア<!--
 --></span><!--
 --></div><!--
 --><span><!--
@@ -1354,12 +1354,12 @@ function tog(var1){
 --></span><!--
 --><div class="RDLLH" id="RDLLH066"><!--
 --><span><!--
---><span class="RDLfI">saveaspng</span><span><!--
+--><span class="RDLfI">save</span><span><!--
 --></span><!--
 --></div><!--
 --><div class="RDLLC" id="RDLLC066"><!--
 --><span><!--
--->PNGとして保存<!--
+-->テキストファイルに保存<!--
 --></span><!--
 --></div><!--
 --><span><!--
@@ -1367,12 +1367,12 @@ function tog(var1){
 --></span><!--
 --><div class="RDLLH" id="RDLLH067"><!--
 --><span><!--
---><span class="RDLfI">saveaspzpr</span><span><!--
+--><span class="RDLfI">saveaspng</span><span><!--
 --></span><!--
 --></div><!--
 --><div class="RDLLC" id="RDLLC067"><!--
 --><span><!--
--->ぱずぷれファイルとして保存<!--
+-->PNGとして保存<!--
 --></span><!--
 --></div><!--
 --><span><!--
@@ -1380,12 +1380,12 @@ function tog(var1){
 --></span><!--
 --><div class="RDLLH" id="RDLLH068"><!--
 --><span><!--
--->48 <span class="RDLfI">setcellsize</span><span><!--
+--><span class="RDLfI">saveaspzpr</span><span><!--
 --></span><!--
 --></div><!--
 --><div class="RDLLC" id="RDLLC068"><!--
 --><span><!--
--->セルのサイズを指定<!--
+-->ぱずぷれファイルとして保存<!--
 --></span><!--
 --></div><!--
 --><span><!--
@@ -1393,10 +1393,23 @@ function tog(var1){
 --></span><!--
 --><div class="RDLLH" id="RDLLH069"><!--
 --><span><!--
--->"saveaspng" <span class="RDLfI">setfileloadrc</span><span><!--
+-->48 <span class="RDLfI">setcellsize</span><span><!--
 --></span><!--
 --></div><!--
 --><div class="RDLLC" id="RDLLC069"><!--
+--><span><!--
+-->セルのサイズを指定<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH070"><!--
+--><span><!--
+-->"saveaspng" <span class="RDLfI">setfileloadrc</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC070"><!--
 --><span><!--
 -->ファイルロードRCスクリプトを設定<br/><!--
 -->ファイルロードRCスクリプトはファイルがドロップされた際に自動で全てのドロップされたファイルに対して実行される<!--
@@ -1405,12 +1418,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH070"><!--
+--><div class="RDLLH" id="RDLLH071"><!--
 --><span><!--
 --><span class="RDLfI">debug</span><span><!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC070"><!--
+--><div class="RDLLC" id="RDLLC071"><!--
 --><span><!--
 -->デバッグ（開発者用）<!--
 --></span><!--
@@ -1418,12 +1431,12 @@ function tog(var1){
 --><span><!--
 --><!--
 --></span><!--
---><div class="RDLLH" id="RDLLH071"><!--
+--><div class="RDLLH" id="RDLLH072"><!--
 --><span><!--
 --><span class="RDLfI">debughist</span><span><!--
 --></span><!--
 --></div><!--
---><div class="RDLLC" id="RDLLC071"><!--
+--><div class="RDLLC" id="RDLLC072"><!--
 --><span><!--
 -->履歴をデバッグ（開発者用）<!--
 --></span><!--

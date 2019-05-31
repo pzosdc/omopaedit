@@ -232,7 +232,7 @@ function oaeerrmsg(obj){
 function oaeconsolemsg(str){
   'use strict';
   let obj = document.getElementById('oaeconsoleout');
-  if( typeof obj === 'undefined' ){
+  if( obj === null ){
     oaeerrmsg(str);
   } else {
     obj.innerHTML = str;
@@ -249,7 +249,7 @@ function oaeconsolemsg_escape(str){
   str = str.replace( /'/g, '&#039;');
   str = str.replace( /`/g, '&#x60;');
   let obj = document.getElementById('oaeconsoleout');
-  if( typeof obj === 'undefined' ){
+  if( obj === null ){
     oaeerrmsg(str);
   } else {
     obj.innerHTML = str;
@@ -260,7 +260,7 @@ function oaeconsolemsg_escape(str){
 function oaeconsoleclean(){
   'use strict';
   let obj = document.getElementById('oaeconsoleout');
-  if( typeof obj === 'undefined' ){
+  if( obj === null ){
   } else {
     obj.innerHTML = '';
   }
@@ -2606,6 +2606,36 @@ function oaedrawui_cursor(targetcontext){
   oae_resetstyle(targetcontext);
 }
 //%}}}
+// oaedrawui_error %{{{
+function oaedrawui_error(targetcontext){
+  'use strict';
+  if( document.getElementById('oaeclevercheckui') === null ) return;
+  let errorlist;
+  if( puzzletype === 'pencils' ){
+    errorlist = pencils.clevercheck_main();
+  } else {
+    return;
+  }
+  targetcontext.fillStyle = 'rgb( 255, 0, 0 )';
+  targetcontext.globalAlpha = 0.5;
+  let pf = Math.floor(gridlinewidth * cellunit) % 2 === 1 ? 0.5 : 0;
+  let l = leftmargin;
+  let t = topmargin;
+  let cu = cellunit;
+  for ( let ic = 0; ic < errorlist.cell.length; ic ++ ) {
+    let ix = errorlist.cell[ic][0];
+    let iy = errorlist.cell[ic][1];
+    targetcontext.moveTo( pf+ l + (ix  ) * cu, pf+ t + (ndivy-iy  ) * cu );
+    targetcontext.lineTo( pf+ l + (ix-1) * cu, pf+ t + (ndivy-iy  ) * cu );
+    targetcontext.lineTo( pf+ l + (ix-1) * cu, pf+ t + (ndivy-iy+1) * cu );
+    targetcontext.lineTo( pf+ l + (ix  ) * cu, pf+ t + (ndivy-iy+1) * cu );
+    targetcontext.closePath();
+    targetcontext.fill();
+    targetcontext.beginPath();
+  }
+  oae_resetstyle(targetcontext);
+}
+//%}}}
 
 // oaedrawgrid %{{{
 function oaedrawgrid(){
@@ -3240,6 +3270,8 @@ function oae_eval_cmd(str){
   'use strict';
   if( str === 'check' ){
     oae_check();
+  } else if( str === 'clevercheck' ){
+    oae_clevercheck();
   } else if( str === 'help' ){
     oae_help();
   } else if( str === 'debug' ){
@@ -3273,6 +3305,7 @@ function oae_help(){
   str = 'コマンド一覧';
   str = str + "<br/> help : このメッセージを表示する";
   str = str + "<br/> check : 正解判定を行う";
+  str = str + "<br/> clevercheck : 正解判定を行う（高機能版）";
   str = str + "<br/> dup : 盤面の複製";
   str = str + "<br/> consoleclean : 出力コンソールエリアのクリア";
   str = str + "<br/> save : テキストファイルに保存";
@@ -3470,6 +3503,23 @@ function oae_check(){
     midloop.check();
   } else if( puzzletype === 'squlin' ){
     squlin.check();
+  } else {
+    oaeconsolemsg('未実装です');
+  }
+  return;
+}
+//%}}}
+// oae_clevercheck %{{{
+function oae_clevercheck(){
+  'use strict';
+  // clevercheck のモチベーションは複数のエラー項目を個別に管理することにある
+  // バリアントパズルや、作りかけのパズルに対して効果を発揮する
+  if( puzzletype === 'pencils' ){
+    pencils.clevercheck();
+  //} else if( puzzletype === 'doublechoco' ){
+  //} else if( puzzletype === 'tentaisho' ){
+  //} else if( puzzletype === 'midloop' ){
+  //} else if( puzzletype === 'squlin' ){
   } else {
     oaeconsolemsg('未実装です');
   }

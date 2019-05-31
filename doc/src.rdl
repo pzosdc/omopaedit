@@ -1,11 +1,11 @@
 && Language    : RDL
 && Description : omopaedit manual
 && Maintainer  : pzdc
-&& Lastchange  : 2019, May. 11
+&& Lastchange  : 2019, Jun. 1
 
-&(; title  &|; omopaedit &;version &; 1.6 &; 簡易マニュアル &);
+&(; title  &|; omopaedit &;version &; 1.7 &; 簡易マニュアル &);
 &(; author &|; pzdc &);
-&(; date   &|; 2019,&; May. &; 11 &);
+&(; date   &|; 2019,&; Jun. &; 1 &);
 &maketitle;
 
 &(C;
@@ -446,7 +446,8 @@
   以下にコマンド一覧を与える。スタックを要する命令は有効な指定を例示している。
   &)P;
   &(L; &fI;help&fO; &|L; ヘルプの出力 &)L;
-  &(L; &fI;check&fO; &|L; 正解判定 &)L;
+  &(L; &fI;check&fO; &|L; 正解判定を行う &)L;
+  &(L; &fI;clevercheck&fO; &|L; 正解判定を行う（高機能版） &)L;
   &(L; &fI;dup&fO; &|L; 現在盤面の複製 &)L;
   &(L; &fI;consoleclean&fO; &|L; 出力コンソールエリアのクリア &)L;
   &(L; &fI;save&fO; &|L; テキストファイルに保存 &)L;
