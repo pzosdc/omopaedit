@@ -1,4 +1,4 @@
-Title  : omopaedit version 1.6 簡易マニュアル
+Title  : omopaedit version 1.7 簡易マニュアル
 Author : pzdc
 Date   : 2019, Jun. 1
 
