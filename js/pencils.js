@@ -762,45 +762,21 @@ clevercheck: function () {
 // clevercheckui_prep %{{{
 clevercheckui_prep: function () {
   'use strict';
-  let obj = document.getElementById('oaeclevercheckui');
-  if( obj === null ){
-    let place = document.getElementById('oaeconsolearea');
-    let ele = document.createElement('div');
-    ele.id = 'oaeclevercheckui';
-    place.insertBefore(ele,place.childNodes[0]);
-    let htmlstr = '';
-    htmlstr = htmlstr + '<div>';
-    //htmlstr = htmlstr + '<a class="clevercheckbutton" id="clevercheck_selectall">全選択</a> ';
-    //htmlstr = htmlstr + '<a class="clevercheckbutton" id="clevercheck_unselectall">全解除</a> ';
-    htmlstr = htmlstr + '<a class="clevercheckbutton" id="clevercheck_recheck">再チェック</a> ';
-    htmlstr = htmlstr + '<a class="clevercheckbutton" id="clevercheck_closeui">閉じる</a> ';
-    htmlstr = htmlstr + '</div>';
-    htmlstr = htmlstr + '<form>';
-    for( let i = 0; i < pencils.clevercheckconditlist.length; i ++ ){
-      htmlstr = htmlstr +
-      '<input type="checkbox" id="clevercheck_' +
-      pencils.clevercheckconditlist[i].tag +
-      '" checked /><label for="clevercheck_' +
-      pencils.clevercheckconditlist[i].tag +
-      '" id="clevercheck_label_' +
-      pencils.clevercheckconditlist[i].tag +
-      '">' +
-      pencils.clevercheckconditlist[i].msg +
-      '</label><br/>';
-    }
-    htmlstr = htmlstr + '</form>';
-    obj = document.getElementById('oaeclevercheckui');
-    obj.innerHTML = htmlstr;
-    document.getElementById('clevercheck_recheck').onclick = function(){
-      pencils.clevercheck();
-    };
-    document.getElementById('clevercheck_closeui').onclick = function(){
-      let par = document.getElementById('oaeconsolearea');
-      let chi = document.getElementById('oaeclevercheckui');
-      par.removeChild(chi);
-    };
+  let formstr = '';
+  for( let i = 0; i < pencils.clevercheckconditlist.length; i ++ ){
+    formstr = formstr +
+    '<input type="checkbox" id="clevercheck_' +
+    pencils.clevercheckconditlist[i].tag +
+    '" checked /><label for="clevercheck_' +
+    pencils.clevercheckconditlist[i].tag +
+    '" id="clevercheck_label_' +
+    pencils.clevercheckconditlist[i].tag +
+    '">' +
+    pencils.clevercheckconditlist[i].msg +
+    '</label><br/>';
   }
-  return obj;
+  oae_clevercheck_prepcore(formstr);
+  return;
 },
 //%}}}
 // clevercheck_main %{{{
