@@ -1195,6 +1195,7 @@ function cellisoutside(ix,iy) {
 // isshaded %{{{
 function isshaded(str) {
   'use strict';
+  if( typeof str === 'undefined' ) return false;
   if( str === '.' ) return false;
   if( str === '#' ) return false;
   if( str === '=' ) return true;
@@ -1209,6 +1210,7 @@ function isunshaded(str) {
   // unshadeとはshadeよりもunshadeを積極的に行う操作
   // 明示的オブジェクトの置かれていないマスに対して積極的にunshadeを選択する
   // shadeとunshadeは例えばスリザーリンクで線を引く操作と、×を描く操作の関係に近い
+  if( typeof str === 'undefined' ) return false;
   if( str === '.' ) return true;
   if( str === '#' ) return false;
   if( str === '=' ) return true;
