@@ -40,7 +40,7 @@ init: function () {
 mousemove: function () {
   'use strict';
   if( editmode === 'qc' ){
-    if( adatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ) return false;
+    if( adatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]$/) !== null ) return false;
     let relx = dragpath[dragpath.length-1][0] - dragpath[0][0];
     let rely = dragpath[dragpath.length-1][1] - dragpath[0][1];
     pencils.dragarrow(dragpath[0][0],dragpath[0][1],relx,rely);
@@ -48,7 +48,7 @@ mousemove: function () {
     oaerewriteall();
   } else if( editmode === 'ac' ){
     if( button === buttonid.left ){
-      if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ){
+      if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]$/) !== null ){
         // 問題の芯からドラッグ
         if( pencils.dragfromcoreisjiku() ){ // ドラッグの最初だけでなく常に判定することによって引き返しに対応
           pencils.jikushade();
@@ -67,8 +67,8 @@ mousemove: function () {
         pencils.dragarrow(dragpath[0][0],dragpath[0][1],relx,rely);
       }
     } else if( button === buttonid.right ){
-      if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ||
-      adatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]/) !== null ){
+      if( qdatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]$/) !== null ||
+      adatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]$/) !== null ){
         // 芯から右ドラッグ
         if( pencils.dragfromcoreisjiku() ){
           pencils.jikushade();
@@ -94,7 +94,7 @@ mousemove: function () {
 leftclick: function () {
   'use strict';
   if( editmode === 'qc' ){
-    if( adatac[focusx][focusy].match(/^[1-4]/) !== null ) return false;
+    if( adatac[focusx][focusy].match(/^[1-4]$/) !== null ) return false;
     let str = qdatac[focusx][focusy];
     if( str.match(/^o[0-9]+$/) !== null ){
       // number
@@ -110,7 +110,7 @@ leftclick: function () {
     }
     oaedrawqdata();
   } else if( editmode === 'ac' ){
-    if( qdatac[focusx][focusy].match(/^[1-4]/) !== null ) return false;
+    if( qdatac[focusx][focusy].match(/^[1-4]$/) !== null ) return false;
     if( qdatac[focusx][focusy].substring(0,1) === 'o' ){
       adatac[focusx][focusy] = adatac[focusx][focusy] === '=' ? '.' : '=';
       oaerewriteall();
@@ -138,7 +138,7 @@ leftclick: function () {
 rightclick: function () {
   'use strict';
   if( editmode === 'qc' ){
-    if( adatac[focusx][focusy].match(/^[1-4]/) !== null ) return false;
+    if( adatac[focusx][focusy].match(/^[1-4]$/) !== null ) return false;
     let str = qdatac[focusx][focusy];
     if( str.match(/^o[0-9]+$/) !== null ){
       // number
@@ -252,8 +252,8 @@ jikushade: function (){
   let cx = dragpath[n-1][0];
   let cy = dragpath[n-1][1];
   if( n === 2 ){
-    if( qdatac[cx][cy].match(/[1-4]/) !== null ||
-    adatac[cx][cy].match(/[1-4]/) !== null ){
+    if( qdatac[cx][cy].match(/^[1-4]$/) !== null ||
+    adatac[cx][cy].match(/^[1-4]$/) !== null ){
       // 芯の後ろに芯がある場合にドラッグをキャンセルする機能
       oae_initdrag();
       return;
@@ -273,8 +273,8 @@ jikushade: function (){
     return;
   }
   if( ! celleraser ){
-    if( qdatac[cx][cy].match(/[1-4]/) !== null ||
-    adatac[cx][cy].match(/[1-4]/) !== null ||
+    if( qdatac[cx][cy].match(/^[1-4]$/) !== null ||
+    adatac[cx][cy].match(/^[1-4]$/) !== null ||
     isshaded(adatac[cx][cy]) ||
     cellisoutside(cx,cy) ||
     Math.pow(cx-px,2) + Math.pow(cy-py,2) !== 1 ){
@@ -416,8 +416,8 @@ reconfigurejiku: function (x,y){
     let cx = cp[0][0];
     let cy = cp[0][1];
     if( i !== 0 ){
-      if( qdatac[cx][cy].match(/[1-4]/) !== null ||
-      adatac[cx][cy].match(/[1-4]/) !== null ){
+      if( qdatac[cx][cy].match(/^[1-4]$/) !== null ||
+      adatac[cx][cy].match(/^[1-4]$/) !== null ){
         break;
       }
       let wallnum = 0;
@@ -444,7 +444,7 @@ reconfigurejiku: function (x,y){
   dragpath.push([newx,newy]);
   celleraser = false;
   isfirstcellchange = false;
-  if( adatac[dragpath[0][0]][dragpath[0][1]].match(/[1-4]/) !== null ){
+  if( adatac[dragpath[0][0]][dragpath[0][1]].match(/^[1-4]$/) !== null ){
     button = buttonid.right;
   }
   return true;
@@ -460,7 +460,7 @@ path: function (){
   let cx = dragpath[n-1][0]; // c = current
   let cy = dragpath[n-1][1];
   if( Math.pow(cx-px,2) + Math.pow(cy-py,2) !== 1 || cellisoutside(cx,cy) ||
-  qdatac[cx][cy].match(/^[1-4]/) !== null || adatac[cx][cy].match(/^[1-4]/) !== null ||
+  qdatac[cx][cy].match(/^[1-4]$/) !== null || adatac[cx][cy].match(/^[1-4]$/) !== null ||
   qdatac[cx][cy].match(/^o/) !== null || isshaded(adatac[cx][cy]) ){
     dragpath.pop();
     return;
@@ -475,8 +475,8 @@ path: function (){
 shadetoggle: function (str) {
   'use strict';
   // shadeできないセルの条件もここに書くことができる
-  if( qdatac[focusx][focusy].match(/^[1-4]/) !== null ) return null;
-  if( adatac[focusx][focusy].match(/^[1-4]/) !== null ) return null;
+  if( qdatac[focusx][focusy].match(/^[1-4]$/) !== null ) return null;
+  if( adatac[focusx][focusy].match(/^[1-4]$/) !== null ) return null;
   return ( str === '.' ) ? '=' : '.';
 },
 //%}}}
@@ -580,6 +580,215 @@ drawcore: function (cx,cy,n,targetcontext,colorin){
 },
 //%}}}
 
+// pzprfileinput %{{{
+pzprfileinput: function () {
+  'use strict';
+  // puzz.link format (Aug. 2019)
+  pencils.pzprfileinput_qdatac();
+  oaefileinput_main_adatav();
+  oaefileinput_main_adatah();
+  pencils.pzprfileinput_adatasennv();
+  pencils.pzprfileinput_adatasennh();
+  pencils.pzprfileinput_adatac();
+},
+//%}}}
+// pzprfileinput_qdatac %{{{
+pzprfileinput_qdatac: function () {
+  'use strict';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s+/);
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( words[ix-1] === 'o-2' ){
+        qdatac[ix][iy] = 'o';
+      } else {
+        qdatac[ix][iy] = words[ix-1];
+      }
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+// pzprfileinput_adatasennv %{{{
+pzprfileinput_adatasennv: function (){
+  'use strict';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s+/);
+    for( let ix = 1; ix < ndivx; ix ++ ){
+      if( words[ix-1] === '1' ){
+        adatav[ix][iy] = '-1';
+      } else if( words[ix-1] === '-1' ){
+        //adatav[ix][iy] = '1';
+      }
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+// pzprfileinput_adatasennh %{{{
+pzprfileinput_adatasennh: function (){
+  'use strict';
+  for( let iy = ndivy-1; iy >= 1; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s+/);
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( words[ix-1] === '1' ){
+        adatah[ix][iy] = '-1';
+      } else if( words[ix-1] === '-1' ){
+        //adatah[ix][iy] = '1';
+      }
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+// pzprfileinput_adatac %{{{
+pzprfileinput_adatac: function () {
+  'use strict';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s+/);
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( words[ix-1] === '+' ){
+        adatac[ix][iy] = '=';
+      } else if ( words[ix-1] === '-' ){
+        adatac[ix][iy] = '.';
+      } else {
+        adatac[ix][iy] = words[ix-1];
+      }
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+
+// pzprfileoutput %{{{
+pzprfileoutput: function () {
+  'use strict';
+  // puzz.link format (Aug. 2019)
+  let str;
+  str = 'pzprv3';
+  str = str + '\n' + puzzletype;
+  str = str + '\n' + ndivy.toString(10);
+  str = str + '\n' + ndivx.toString(10);
+  str = str + '\n';
+  str = str + pencils.pzprfileoutput_qdatac();
+  str = str + pencils.pzprfileoutput_adatajikuv();
+  str = str + pencils.pzprfileoutput_adatajikuh();
+  str = str + pencils.pzprfileoutput_adatasennv();
+  str = str + pencils.pzprfileoutput_adatasennh();
+  str = str + pencils.pzprfileoutput_adatac();
+  return str;
+},
+//%}}}
+// pzprfileoutput_qdatac %{{{
+pzprfileoutput_qdatac: function () {
+  'use strict';
+  let str = '';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( qdatac[ix][iy] === 'o' ){
+        str = str + ' o-2';
+      } else {
+        str = str + ' ' + qdatac[ix][iy];
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+// pzprfileoutput_adatajikuv %{{{
+pzprfileoutput_adatajikuv: function (){
+  'use strict';
+  let str = '';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix < ndivx; ix ++ ){
+      if( adatav[ix][iy] === '1' ){
+        str = str + ' 1';
+      } else {
+        str = str + ' 0';
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+// pzprfileoutput_adatajikuh %{{{
+pzprfileoutput_adatajikuh: function (){
+  'use strict';
+  let str = '';
+  for( let iy = ndivy-1; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( adatah[ix][iy] === '1' ){
+        str = str + ' 1';
+      } else {
+        str = str + ' 0';
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+// pzprfileoutput_adatasennv %{{{
+pzprfileoutput_adatasennv: function (){
+  'use strict';
+  let str = '';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix < ndivx; ix ++ ){
+      if( adatav[ix][iy] === '-1' ){
+        str = str + ' 1';
+      } else {
+        str = str + ' 0';
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+// pzprfileoutput_adatasennh %{{{
+pzprfileoutput_adatasennh: function (){
+  'use strict';
+  let str = '';
+  for( let iy = ndivy-1; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( adatah[ix][iy] === '-1' ){
+        str = str + ' 1';
+      } else {
+        str = str + ' 0';
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+// pzprfileoutput_adatac %{{{
+pzprfileoutput_adatac: function () {
+  'use strict';
+  let str = '';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( adatac[ix][iy] === '=' ){
+        str = str + ' +';
+      } else {
+        str = str + ' ' + adatac[ix][iy];
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+
 // check %{{{
 check: function () {
   'use strict';
@@ -625,9 +834,9 @@ hasacceptableanswer: function () {
     for( let iy = 1; iy <= ndivy; iy ++ ){
       if( iswood[ix][iy] ){
         // 軸のマスに芯があればエラー
-        if( adatac[ix][iy].match(/^[1-4]/) !== null ){
+        if( adatac[ix][iy].match(/^[1-4]$/) !== null ){
           return [false,{posx:ix,posy:iy,errmsg:'芯が軸の内部にあります'}];
-        } else if( qdatac[ix][iy].match(/^[1-4]/) !== null ){
+        } else if( qdatac[ix][iy].match(/^[1-4]$/) !== null ){
           return [false,{posx:ix,posy:iy,errmsg:'芯が軸の内部にあります'}];
         }
       } else {
@@ -641,7 +850,7 @@ hasacceptableanswer: function () {
   // 芯に注目し、分岐がないことを確認しながら、芯に近い所から徐々にcollectしていく
   for( let ix = 1; ix <= ndivx; ix ++ ){
     for( let iy = 1; iy <= ndivy; iy ++ ){
-      if( qdatac[ix][iy].match(/^[1-4]/) === null && adatac[ix][iy].match(/^[1-4]/) === null ) continue;
+      if( qdatac[ix][iy].match(/^[1-4]$/) === null && adatac[ix][iy].match(/^[1-4]$/) === null ) continue;
       iscollected[ix][iy] = true;
       let cx = ix;
       let cy = iy;
@@ -725,7 +934,7 @@ hasacceptableanswer: function () {
         if( il === woodlength+1 && (ex !== 0 || ey !== 0 ) ) return [false,{posx:ix,posy:iy,errmsg:'線が軸より長くなっています'}];
         if( il === woodlength+1 ){
           // 終点に芯があると線が共有されてしまうのでそれも確認しておく
-          if( qdatac[cx][cy].match(/^[1-4]/) !== null || adatac[cx][cy].match(/^[1-4]/) !== null ){
+          if( qdatac[cx][cy].match(/^[1-4]$/) !== null || adatac[cx][cy].match(/^[1-4]$/) !== null ){
             return [false,{posx:cx,posy:cy,errmsg:'線を二つの芯が共有しています'}];
           }
           break;
@@ -762,45 +971,21 @@ clevercheck: function () {
 // clevercheckui_prep %{{{
 clevercheckui_prep: function () {
   'use strict';
-  let obj = document.getElementById('oaeclevercheckui');
-  if( obj === null ){
-    let place = document.getElementById('oaeconsolearea');
-    let ele = document.createElement('div');
-    ele.id = 'oaeclevercheckui';
-    place.insertBefore(ele,place.childNodes[0]);
-    let htmlstr = '';
-    htmlstr = htmlstr + '<div>';
-    //htmlstr = htmlstr + '<a class="clevercheckbutton" id="clevercheck_selectall">全選択</a> ';
-    //htmlstr = htmlstr + '<a class="clevercheckbutton" id="clevercheck_unselectall">全解除</a> ';
-    htmlstr = htmlstr + '<a class="clevercheckbutton" id="clevercheck_recheck">再チェック</a> ';
-    htmlstr = htmlstr + '<a class="clevercheckbutton" id="clevercheck_closeui">閉じる</a> ';
-    htmlstr = htmlstr + '</div>';
-    htmlstr = htmlstr + '<form>';
-    for( let i = 0; i < pencils.clevercheckconditlist.length; i ++ ){
-      htmlstr = htmlstr +
-      '<input type="checkbox" id="clevercheck_' +
-      pencils.clevercheckconditlist[i].tag +
-      '" checked /><label for="clevercheck_' +
-      pencils.clevercheckconditlist[i].tag +
-      '" id="clevercheck_label_' +
-      pencils.clevercheckconditlist[i].tag +
-      '">' +
-      pencils.clevercheckconditlist[i].msg +
-      '</label><br/>';
-    }
-    htmlstr = htmlstr + '</form>';
-    obj = document.getElementById('oaeclevercheckui');
-    obj.innerHTML = htmlstr;
-    document.getElementById('clevercheck_recheck').onclick = function(){
-      pencils.clevercheck();
-    };
-    document.getElementById('clevercheck_closeui').onclick = function(){
-      let par = document.getElementById('oaeconsolearea');
-      let chi = document.getElementById('oaeclevercheckui');
-      par.removeChild(chi);
-    };
+  let formstr = '';
+  for( let i = 0; i < pencils.clevercheckconditlist.length; i ++ ){
+    formstr = formstr +
+    '<input type="checkbox" id="clevercheck_' +
+    pencils.clevercheckconditlist[i].tag +
+    '" checked /><label for="clevercheck_' +
+    pencils.clevercheckconditlist[i].tag +
+    '" id="clevercheck_label_' +
+    pencils.clevercheckconditlist[i].tag +
+    '">' +
+    pencils.clevercheckconditlist[i].msg +
+    '</label><br/>';
   }
-  return obj;
+  oae_clevercheck_prepcore(formstr);
+  return;
 },
 //%}}}
 // clevercheck_main %{{{
@@ -877,7 +1062,7 @@ clevercheck_core_on_jiku: function () {
   for( let ix = 1; ix <= ndivx; ix ++ ){
     for( let iy = 1; iy <= ndivy; iy ++ ){
       if( adatac[ix][iy] !== '=' ) continue;
-      if( qdatac[ix][iy].match(/^[1-4]/) !== null ){
+      if( qdatac[ix][iy].match(/^[1-4]$/) !== null ){
         l.push([ix,iy]);
       }
     }
@@ -910,9 +1095,9 @@ clevercheck_isolate_core: function () {
   for( let ix = 1; ix <= ndivx; ix ++ ){
     for( let iy = 1; iy <= ndivy; iy ++ ){
       let dir;
-      if( qdatac[ix][iy].match(/^[1-4]/) !== null ){
+      if( qdatac[ix][iy].match(/^[1-4]$/) !== null ){
         dir = qdatac[ix][iy];
-      } else if( adatac[ix][iy].match(/^[1-4]/) !== null ){
+      } else if( adatac[ix][iy].match(/^[1-4]$/) !== null ){
         dir = adatac[ix][iy];
       } else {
         continue;
@@ -952,8 +1137,8 @@ clevercheck_isolate_line: function () {
       for( let ic = 0; ic < cellarr.length; ic ++ ){
         let cx = cellarr[ic][0];
         let cy = cellarr[ic][1];
-        if( qdatac[cx][cy].match(/^[1-4]/) !== null ){ corefound = true; break;}
-        if( adatac[cx][cy].match(/^[1-4]/) !== null ){ corefound = true; break;}
+        if( qdatac[cx][cy].match(/^[1-4]$/) !== null ){ corefound = true; break;}
+        if( adatac[cx][cy].match(/^[1-4]$/) !== null ){ corefound = true; break;}
       }
       for( let ic = 0; ic < cellarr.length; ic ++ ){
         let cx = cellarr[ic][0];
@@ -1026,8 +1211,8 @@ clevercheck_share_line: function () {
       for( let ic = 0; ic < cellarr.length; ic ++ ){
         let cx = cellarr[ic][0];
         let cy = cellarr[ic][1];
-        if( qdatac[cx][cy].match(/^[1-4]/) !== null ) corefound ++;
-        if( adatac[cx][cy].match(/^[1-4]/) !== null ) corefound ++;
+        if( qdatac[cx][cy].match(/^[1-4]$/) !== null ) corefound ++;
+        if( adatac[cx][cy].match(/^[1-4]$/) !== null ) corefound ++;
       }
       for( let ic = 0; ic < cellarr.length; ic ++ ){
         let cx = cellarr[ic][0];
@@ -1166,9 +1351,9 @@ clevercheck_unequal_length_core: function () {
   for( let ix = 1; ix <= ndivx; ix ++ ){
     for( let iy = 1; iy <= ndivy; iy ++ ){
       let dir;
-      if( qdatac[ix][iy].match(/^[1-4]/) !== null ){
+      if( qdatac[ix][iy].match(/^[1-4]$/) !== null ){
         dir = qdatac[ix][iy];
-      } else if( adatac[ix][iy].match(/^[1-4]/) !== null ){
+      } else if( adatac[ix][iy].match(/^[1-4]$/) !== null ){
         dir = adatac[ix][iy];
       } else {
         continue;

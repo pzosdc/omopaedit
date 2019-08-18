@@ -1195,6 +1195,7 @@ function cellisoutside(ix,iy) {
 // isshaded %{{{
 function isshaded(str) {
   'use strict';
+  if( typeof str === 'undefined' ) return false;
   if( str === '.' ) return false;
   if( str === '#' ) return false;
   if( str === '=' ) return true;
@@ -1209,6 +1210,7 @@ function isunshaded(str) {
   // unshadeとはshadeよりもunshadeを積極的に行う操作
   // 明示的オブジェクトの置かれていないマスに対して積極的にunshadeを選択する
   // shadeとunshadeは例えばスリザーリンクで線を引く操作と、×を描く操作の関係に近い
+  if( typeof str === 'undefined' ) return false;
   if( str === '.' ) return true;
   if( str === '#' ) return false;
   if( str === '=' ) return true;
@@ -1967,6 +1969,8 @@ function oaepzproutput_base(){
     str = squlin.pzprfileoutput();
   } else if( puzzletype === 'doublechoco' ){
     str = doublechoco.pzprfileoutput();
+  } else if( puzzletype === 'pencils' ){
+    str = pencils.pzprfileoutput();
   } else {
     return false;
   }
@@ -2146,6 +2150,7 @@ function oaefileinput_base(str){
     if( puzzletype === 'tentaisho' ){ tentaisho.pzprfileinput();
     } else if( puzzletype === 'squlin' ){ squlin.pzprfileinput();
     } else if( puzzletype === 'doublechoco' ){ doublechoco.pzprfileinput();
+    } else if( puzzletype === 'pencils' ){ pencils.pzprfileinput();
     } else {
       oaeconsolemsg('このパズルはぱずぷれ入力に対応していません');
       return false;
@@ -3316,6 +3321,20 @@ function oae_help(){
   str = str + "<br/> debug : デバッグ（開発者用）";
   str = str + "<br/> debughist : デバッグ（開発者用）";
   oaeconsolemsg(str);
+  return;
+}
+//%}}}
+// oae_never %{{{
+function oae_never(){
+  'use strict';
+  // 基本的にパズルごとのファイルからしか実行されていない関数のリスト
+  oae_wall();
+  oae_path();
+  oae_shade();
+  oae_unshade();
+  oaedrawui_error();
+  oae_clevercheck_prepcore();
+  return;
 }
 //%}}}
 
@@ -3522,6 +3541,37 @@ function oae_clevercheck(){
   //} else if( puzzletype === 'squlin' ){
   } else {
     oaeconsolemsg('未実装です');
+  }
+  return;
+}
+//%}}}
+// oae_clevercheck_prepcore %{{{
+function oae_clevercheck_prepcore(formstr){
+  'use strict';
+  let obj = document.getElementById('oaeclevercheckui');
+  if( obj === null ){
+    let place = document.getElementById('oaeconsolearea');
+    let ele = document.createElement('div');
+    ele.id = 'oaeclevercheckui';
+    place.insertBefore(ele,place.childNodes[0]);
+    let htmlstr = '';
+    htmlstr = htmlstr + '<div>';
+    //htmlstr = htmlstr + '<a class="clevercheckbutton" id="clevercheck_selectall">全選択</a> ';
+    //htmlstr = htmlstr + '<a class="clevercheckbutton" id="clevercheck_unselectall">全解除</a> ';
+    htmlstr = htmlstr + '<a class="clevercheckbutton" id="clevercheck_recheck">再チェック</a> ';
+    htmlstr = htmlstr + '<a class="clevercheckbutton" id="clevercheck_closeui">閉じる</a> ';
+    htmlstr = htmlstr + '</div>';
+    htmlstr = htmlstr + '<form>' + formstr + '</form>';
+    obj = document.getElementById('oaeclevercheckui');
+    obj.innerHTML = htmlstr;
+    document.getElementById('clevercheck_recheck').onclick = function(){
+      oae_clevercheck();
+    };
+    document.getElementById('clevercheck_closeui').onclick = function(){
+      let par = document.getElementById('oaeconsolearea');
+      let chi = document.getElementById('oaeclevercheckui');
+      par.removeChild(chi);
+    };
   }
   return;
 }
