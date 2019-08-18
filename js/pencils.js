@@ -580,6 +580,215 @@ drawcore: function (cx,cy,n,targetcontext,colorin){
 },
 //%}}}
 
+// pzprfileinput %{{{
+pzprfileinput: function () {
+  'use strict';
+  // puzz.link format (Aug. 2019)
+  pencils.pzprfileinput_qdatac();
+  oaefileinput_main_adatav();
+  oaefileinput_main_adatah();
+  pencils.pzprfileinput_adatasennv();
+  pencils.pzprfileinput_adatasennh();
+  pencils.pzprfileinput_adatac();
+},
+//%}}}
+// pzprfileinput_qdatac %{{{
+pzprfileinput_qdatac: function () {
+  'use strict';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s+/);
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( words[ix-1] === 'o-2' ){
+        qdatac[ix][iy] = 'o';
+      } else {
+        qdatac[ix][iy] = words[ix-1];
+      }
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+// pzprfileinput_adatasennv %{{{
+pzprfileinput_adatasennv: function (){
+  'use strict';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s+/);
+    for( let ix = 1; ix < ndivx; ix ++ ){
+      if( words[ix-1] === '1' ){
+        adatav[ix][iy] = '-1';
+      } else if( words[ix-1] === '-1' ){
+        //adatav[ix][iy] = '1';
+      }
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+// pzprfileinput_adatasennh %{{{
+pzprfileinput_adatasennh: function (){
+  'use strict';
+  for( let iy = ndivy-1; iy >= 1; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s+/);
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( words[ix-1] === '1' ){
+        adatah[ix][iy] = '-1';
+      } else if( words[ix-1] === '-1' ){
+        //adatah[ix][iy] = '1';
+      }
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+// pzprfileinput_adatac %{{{
+pzprfileinput_adatac: function () {
+  'use strict';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s+/);
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( words[ix-1] === '+' ){
+        adatac[ix][iy] = '=';
+      } else if ( words[ix-1] === '-' ){
+        adatac[ix][iy] = '.';
+      } else {
+        adatac[ix][iy] = words[ix-1];
+      }
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+
+// pzprfileoutput %{{{
+pzprfileoutput: function () {
+  'use strict';
+  // puzz.link format (Aug. 2019)
+  let str;
+  str = 'pzprv3';
+  str = str + '\n' + puzzletype;
+  str = str + '\n' + ndivy.toString(10);
+  str = str + '\n' + ndivx.toString(10);
+  str = str + '\n';
+  str = str + pencils.pzprfileoutput_qdatac();
+  str = str + pencils.pzprfileoutput_adatajikuv();
+  str = str + pencils.pzprfileoutput_adatajikuh();
+  str = str + pencils.pzprfileoutput_adatasennv();
+  str = str + pencils.pzprfileoutput_adatasennh();
+  str = str + pencils.pzprfileoutput_adatac();
+  return str;
+},
+//%}}}
+// pzprfileoutput_qdatac %{{{
+pzprfileoutput_qdatac: function () {
+  'use strict';
+  let str = '';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( qdatac[ix][iy] === 'o' ){
+        str = str + ' o-2';
+      } else {
+        str = str + ' ' + qdatac[ix][iy];
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+// pzprfileoutput_adatajikuv %{{{
+pzprfileoutput_adatajikuv: function (){
+  'use strict';
+  let str = '';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix < ndivx; ix ++ ){
+      if( adatav[ix][iy] === '1' ){
+        str = str + ' 1';
+      } else {
+        str = str + ' 0';
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+// pzprfileoutput_adatajikuh %{{{
+pzprfileoutput_adatajikuh: function (){
+  'use strict';
+  let str = '';
+  for( let iy = ndivy-1; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( adatah[ix][iy] === '1' ){
+        str = str + ' 1';
+      } else {
+        str = str + ' 0';
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+// pzprfileoutput_adatasennv %{{{
+pzprfileoutput_adatasennv: function (){
+  'use strict';
+  let str = '';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix < ndivx; ix ++ ){
+      if( adatav[ix][iy] === '-1' ){
+        str = str + ' 1';
+      } else {
+        str = str + ' 0';
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+// pzprfileoutput_adatasennh %{{{
+pzprfileoutput_adatasennh: function (){
+  'use strict';
+  let str = '';
+  for( let iy = ndivy-1; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( adatah[ix][iy] === '-1' ){
+        str = str + ' 1';
+      } else {
+        str = str + ' 0';
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+// pzprfileoutput_adatac %{{{
+pzprfileoutput_adatac: function () {
+  'use strict';
+  let str = '';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( adatac[ix][iy] === '=' ){
+        str = str + ' +';
+      } else {
+        str = str + ' ' + adatac[ix][iy];
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+
 // check %{{{
 check: function () {
   'use strict';
