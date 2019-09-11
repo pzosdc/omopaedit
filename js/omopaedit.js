@@ -94,6 +94,7 @@ var dragpath;
 //----------
 var objectstack;
 var fileloadrc;
+var drawscript;
 //----------
 //%}}}
 const buttonid = { left: 0, right: 2 };
@@ -275,6 +276,7 @@ function oaeclean(){
   oaedrawhist();
   oaedrawqdata();
   oaedrawadata();
+  oaedrawscript();
   oaedrawui();
 }
 //%}}}
@@ -287,6 +289,7 @@ function oaeansclean(){
   oaedrawhist();
   oaedrawqdata();
   oaedrawadata();
+  oaedrawscript();
   oaedrawui();
 }
 //%}}}
@@ -388,8 +391,8 @@ function oaeinit_puzzle(){
 function oaeinit_script(){
   'use strict';
   fileloadrc = '';
-  //fileloadrc = 'saveaspng';
   objectstack = [];
+  drawscript = [];
 }
 //%}}}
 // oaeinitcolor %{{{
@@ -2115,6 +2118,9 @@ function oaefileinput_base(str){
   arr.shift();
   if( formatstr === 'pzprv3' ){
   } else if( formatstr === 'oaef0' ){
+  } else if( formatstr === 'oaescript0' ){
+    oaefileinput_script(arr);
+    return true;
   } else {
     // unknown format
     return false;
@@ -2170,6 +2176,7 @@ function oaefileinput_base(str){
   oaedrawhist();
   oaedrawqdata();
   oaedrawadata();
+  oaedrawscript();
   oaedrawui();
   return true;
 }
@@ -2272,6 +2279,18 @@ function oaefileinput_main_adatah(){
   return;
 }
 //%}}}
+// oaefileinput_script %{{{
+function oaefileinput_script(arr){
+  'use strict';
+  let str = '';
+  for( let i = 0; i < arr.length; i ++ ){
+    str = str + ' ' + arr[i];
+  }
+  str = str.trim(); // 文字列の先頭と末尾の空白を削除
+  oae_evalscript(str);
+  return;
+}
+//%}}}
 
 // oae_duplicateboard %{{{
 function oae_duplicateboard(){
@@ -2296,6 +2315,7 @@ function oaerewriteall(){
   oaedrawhist();
   oaedrawqdata();
   oaedrawadata();
+  oaedrawscript();
   oaedrawui();
 }
 //%}}}
@@ -2764,6 +2784,36 @@ function oaedrawgrid_border(targetcontext){
 }
 //%}}}
 
+// oaedrawscript %{{{
+function oaedrawscript(){
+  'use strict';
+  let n = drawscript.length;
+  let targetcontext = bgcontext;
+  let pos = [];
+  let l = leftmargin;
+  let t = totalheight - bottommargin;
+  for ( let is = 0; is < n; is ++ ) {
+    if( drawscript[is].type === 'real' ){
+      pos.push(drawscript[is].value * cellunit );
+    } else if ( drawscript[is].type == 'str' ){
+      if( drawscript[is].value == 'moveto' ){
+        targetcontext.moveTo( l + pos[0], t - pos[1] );
+        pos = [];
+      } else if( drawscript[is].value == 'lineto' ){
+        targetcontext.lineTo( l + pos[0], t - pos[1] );
+        pos = [];
+      } else if( drawscript[is].value == 'closepath' ){
+        targetcontext.closePath();
+      } else if( drawscript[is].value == 'stroke' ){
+        targetcontext.stroke();
+        targetcontext.beginPath();
+      }
+    }
+  }
+  oae_resetstyle(targetcontext);
+}
+//%}}}
+
 // oaedrawqdata %{{{
 function oaedrawqdata(){
   'use strict';
@@ -3224,9 +3274,12 @@ function oae_evalscript(str){
 // oae_eval_token %{{{
 function oae_eval_token(token){
   'use strict';
-  if( token.match(/^[0-9]*$/) !== null ){ // [TODO] 実数の入力
+  if( token.match(/^-?[0-9]*$/) !== null ){
     let n = new Stackobj( 'real', parseInt(token,10) );
     objectstack.push(n);
+  } else if( token.match(/^-?[0-9]*\.[0-9]*$/) !== null ){
+    let v = new Stackobj( 'real', parseFloat(token) );
+    objectstack.push(v);
   } else if( token === 'true' ){
     let b = new Stackobj( 'bool', true );
     objectstack.push(b);
@@ -3234,7 +3287,6 @@ function oae_eval_token(token){
     let b = new Stackobj( 'bool', false );
     objectstack.push(b);
   } else if( token.charAt(0) === '"' ){
-    //let b = new Stackobj( 'str', token );
     let b = new Stackobj( 'str', oae_unquotestring(token) );
     objectstack.push(b);
   } else if( token.match(/^[a-zA-Z][a-zA-Z0-9_]*$/) !== null ){
@@ -3297,6 +3349,33 @@ function oae_eval_cmd(str){
     oaesetcellsize();
   } else if( str === 'setfileloadrc' ){
     oae_setfileloadrc();
+  } else if( str === 'drawscriptclean' ){
+    drawscript = [];
+  } else if( str === 'moveto' || str === 'lineto' ){
+    if( objectstack.length === 0 ) return;
+    if( objectstack.length === 1 ) return;
+    {
+      let n = objectstack.length;
+      let v;
+      let cmd;
+      v = objectstack[n-2].value;
+      cmd = new Stackobj( 'real', v );
+      drawscript.push(cmd)
+      v = objectstack[n-1].value;
+      cmd = new Stackobj( 'real', v );
+      drawscript.push(cmd)
+      objectstack.pop();
+      objectstack.pop();
+    }
+    let cmd = new Stackobj( 'str', str );
+    drawscript.push(cmd);
+  } else if( str === 'closepath' ){
+    let cmd = new Stackobj( 'str', str );
+    drawscript.push(cmd);
+  } else if( str === 'stroke' || str === 'fill' ){
+    let cmd = new Stackobj( 'str', str );
+    drawscript.push(cmd);
+    oaerewriteall();
   } else {
     oaeconsolemsg_escape('未知のコマンドです: '+str);
   }
@@ -3370,6 +3449,7 @@ function oae_aviewflip(){
   oaedrawgrid();
   oaedrawqdata();
   oaedrawadata();
+  oaedrawscript();
   oaedrawui();
   return;
 }
