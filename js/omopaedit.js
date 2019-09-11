@@ -3351,6 +3351,7 @@ function oae_eval_cmd(str){
     oae_setfileloadrc();
   } else if( str === 'drawscriptclean' ){
     drawscript = [];
+    oaerewriteall();
   } else if( str === 'moveto' || str === 'lineto' ){
     if( objectstack.length === 0 ) return;
     if( objectstack.length === 1 ) return;
