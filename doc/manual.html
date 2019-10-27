@@ -17,13 +17,13 @@ function tog(var1){
 --><!--
 --></span><!--
 --><div class="RDLtitle"><!--
--->omopaedit version 1.8 簡易マニュアル<!--
+-->omopaedit version 1.8.2 簡易マニュアル<!--
 --></div><!--
 --><div class="RDLauthor"><!--
 -->pzdc<!--
 --></div><!--
 --><div class="RDLdate"><!--
--->2019, Aug. 18<!--
+-->2019, Oct. 28<!--
 --></div><!--
 --><!--
 --></span><!--
@@ -1270,7 +1270,7 @@ function tog(var1){
 --></span><!--
 --><div class="RDLSH" id="RDLSH012" onclick="tog('RDLSC012')"><!--
 --><span><!--
--->12.  コマンドの一覧<!--
+-->12.  スクリプト<!--
 --></span><!--
 --></div><!--
 --><div class="RDLSC" id="RDLSC012"><!--
@@ -1281,7 +1281,31 @@ function tog(var1){
 --><span><!--
 -->処理系はスタックを保持し、整数、ブール値、文字列がプッシュできる。<br/><!--
 -->コマンドはゼロオペランド命令であり、盤面やスタックに対して処理を命令する。コマンドは通常、半角スペース文字によってセパレートされたトークンの形式で入力される。不正な入力はHTML用にエスケープして出力する。<br/><!--
--->以下にコマンド一覧を与える。スタックを要する命令は有効な指定を例示している。<!--
+--><!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLPH" id="RDLPH015"><!--
+--><span><!--
+-->描画命令が描画命令キューにひとたび追加されると、再描画が起こるたびに完全な描画が行われる。盤面の表示エリア外部に対する描画はクリップされる。<span class="RDLfI">setcellsize</span><span>で表示サイズを変更した場合や、GUIで色設定を変更した場合には全ての描画が自動で対応するように更新される。描画命令は<span class="RDLfI">drawscriptclean</span><span>コマンドにて消去しない限り蓄積することに注意する。<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLPH" id="RDLPH016"><!--
+--><span><!--
+-->一連のスクリプトはスクリプトファイルから読み込んで実行させることができる。スクリプトファイルは先頭行が<span class="RDLfI">oaescript0</span><span>から開始するファイルである。<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLPH" id="RDLPH017"><!--
+--><span><!--
+-->以下にコマンドの完全な一覧を与える。スタックを要する命令は有効な指定を例示している。<!--
 --></span><!--
 --></div><!--
 --><span><!--
@@ -1420,12 +1444,12 @@ function tog(var1){
 --></span><!--
 --><div class="RDLLH" id="RDLLH071"><!--
 --><span><!--
---><span class="RDLfI">debug</span><span><!--
+-->"mypuzzle_1" <span class="RDLfI">settitle</span><span><!--
 --></span><!--
 --></div><!--
 --><div class="RDLLC" id="RDLLC071"><!--
 --><span><!--
--->デバッグ（開発者用）<!--
+-->ヘッダータイトルを指定<!--
 --></span><!--
 --></div><!--
 --><span><!--
@@ -1433,10 +1457,127 @@ function tog(var1){
 --></span><!--
 --><div class="RDLLH" id="RDLLH072"><!--
 --><span><!--
---><span class="RDLfI">debughist</span><span><!--
+--><span class="RDLfI">drawscriptclean</span><span><!--
 --></span><!--
 --></div><!--
 --><div class="RDLLC" id="RDLLC072"><!--
+--><span><!--
+-->描画命令キューの初期化<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH073"><!--
+--><span><!--
+-->1 1 <span class="RDLfI">moveto</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC073"><!--
+--><span><!--
+-->カレントパスをリセットしてから指定した座標へカレントポイントを移動<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH074"><!--
+--><span><!--
+-->1 1 <span class="RDLfI">lineto</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC074"><!--
+--><span><!--
+-->カレントポイントから指定した座標への直線をカレントパスに追加<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH075"><!--
+--><span><!--
+--><span class="RDLfI">closepath</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC075"><!--
+--><span><!--
+-->カレントパスを閉じる<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH076"><!--
+--><span><!--
+--><span class="RDLfI">stroke</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC076"><!--
+--><span><!--
+-->カレントパスに沿った線を描画する命令を描画命令キューに追加<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH077"><!--
+--><span><!--
+--><span class="RDLfI">fill</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC077"><!--
+--><span><!--
+-->カレントパスの内側をフィルする命令を描画命令キューに追加<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH078"><!--
+--><span><!--
+--><span class="RDLfI">white</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC078"><!--
+--><span><!--
+-->フィル色を解答塗りつぶし色１に設定する命令を描画命令キューに追加（廃止予定）<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH079"><!--
+--><span><!--
+--><span class="RDLfI">black</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC079"><!--
+--><span><!--
+-->フィル色を解答塗りつぶし色２に設定する命令を描画命令キューに追加（廃止予定）<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH080"><!--
+--><span><!--
+--><span class="RDLfI">debug</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC080"><!--
+--><span><!--
+-->デバッグ（開発者用）<!--
+--></span><!--
+--></div><!--
+--><span><!--
+--><!--
+--></span><!--
+--><div class="RDLLH" id="RDLLH081"><!--
+--><span><!--
+--><span class="RDLfI">debughist</span><span><!--
+--></span><!--
+--></div><!--
+--><div class="RDLLC" id="RDLLC081"><!--
 --><span><!--
 -->履歴をデバッグ（開発者用）<!--
 --></span><!--

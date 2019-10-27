@@ -157,27 +157,13 @@ function Stackobj(objtype,objvalue){
   if( typeof this === 'undefined' ){
     return new Stackobj(objtype,objvalue);
   }
-  if( objtype === 'real' && typeof objvalue === 'number' ||
-  objtype === 'bool' && typeof objvalue === 'boolean' ||
-  objtype === 'str' && typeof objvalue === 'string'
+  if( objtype === 'real' ||
+  objtype === 'bool' ||
+  objtype === 'str'
   ) {
     // basic type
     this.type = objtype;
     this.value = objvalue;
-//-------------------------------------------------
-//  } else if( objtype === 'arr' && isoaearray(objvalue) ){
-//    // array
-//    this.type = objtype;
-//    this.value = objvalue;
-//  } else if( objtype === 'proc' && typeof objvalue === 'string' ){
-//    // procedure (handled as string in this system)
-//    this.type = objtype;
-//    this.value = objvalue;
-//  } else if( objtype === 'mark' && objvalue === '[' ||
-//  objtype === 'mark' && objvalue === ']' ){
-//    this.type = objtype;
-//    this.value = objvalue;
-//-------------------------------------------------
   } else if( objtype === 'error' ){
     this.type = objtype;
     this.value = objvalue; // error info
@@ -297,6 +283,7 @@ function oaeansclean(){
 function oaeinit(){
   'use strict';
   cellunit = 35;
+  //cellunit = 24;
   celladjust = 1;
   ndivx = 10;
   ndivy = 10;
@@ -2081,12 +2068,14 @@ function oaefileinput_filelist(i,filelist){
     fr.readAsText(file);
     fr.addEventListener('load',function(){
       let str = fr.result;
-      if( oaefileinput_base(str) ){
+      let returnstr = oaefileinput_base(str);
+      if( returnstr === "success" ){
         // ロードに成功したタイミングでヘッダーに反映しloadrcを実行
         document.getElementById('oaeheader').value = filename;
         if( fileloadrc !== '' ){
           oae_evalscript(fileloadrc);
         }
+      } else if( returnstr === "script" ){
       } else {
         oaeerrmsg("load file failed: "+filename);
       }
@@ -2120,17 +2109,17 @@ function oaefileinput_base(str){
   } else if( formatstr === 'oaef0' ){
   } else if( formatstr === 'oaescript0' ){
     oaefileinput_script(arr);
-    return true;
+    return "script";
   } else {
     // unknown format
-    return false;
+    return "unknown_format";
   }
   let prev_puzzletype = puzzletype;
   puzzletype = arr[0].trim();
   oae_checkandfixpuzzletype();
   if( puzzletype === false ){
     oaeconsolemsg('未知のパズルです');
-    return false; // unknown puzzletype
+    return "unknown_puzzle"; // unknown puzzletype
   }
   if( puzzletype !== prev_puzzletype ){
     str = str.replace(/\n/g,'%N');
@@ -2141,10 +2130,10 @@ function oaefileinput_base(str){
   oae_reflectpuzzletype();
   arr.shift();
   //-------------------------------------
-  if( arr[0].match(/^\s*[1-9][0-9]*\s*$/) === null ) return false;
+  if( arr[0].match(/^\s*[1-9][0-9]*\s*$/) === null ) return "Error";
   ndivy = parseInt(arr[0],10);
   arr.shift();
-  if( arr[0].match(/^\s*[1-9][0-9]*\s*$/) === null ) return false;
+  if( arr[0].match(/^\s*[1-9][0-9]*\s*$/) === null ) return "Error";
   ndivx = parseInt(arr[0],10);
   arr.shift();
   //-------------------------------------
@@ -2159,7 +2148,7 @@ function oaefileinput_base(str){
     } else if( puzzletype === 'pencils' ){ pencils.pzprfileinput();
     } else {
       oaeconsolemsg('このパズルはぱずぷれ入力に対応していません');
-      return false;
+      return "Error";
     }
   } else if( formatstr === 'oaef0' ){
     if( hasqdatap ) oaefileinput_main_qdatap();
@@ -2178,7 +2167,7 @@ function oaefileinput_base(str){
   oaedrawadata();
   oaedrawscript();
   oaedrawui();
-  return true;
+  return "success";
 }
 //%}}}
 // oaefileinput_main_qdatap %{{{
@@ -2792,11 +2781,20 @@ function oaedrawscript(){
   let pos = [];
   let l = leftmargin;
   let t = totalheight - bottommargin;
+  targetcontext.save();
+  targetcontext.rect(leftmargin,topmargin,gridwidth,gridheight);
+  targetcontext.stroke();
+  targetcontext.clip();
+  targetcontext.lineCap = 'round';
+  targetcontext.lineWidth = Math.max( 1, Math.floor(walllinewidth * cellunit) );
+  targetcontext.globalAlpha = opacity;
+  targetcontext.strokeStyle = answerlinecolor;
   for ( let is = 0; is < n; is ++ ) {
     if( drawscript[is].type === 'real' ){
       pos.push(drawscript[is].value * cellunit );
     } else if ( drawscript[is].type == 'str' ){
       if( drawscript[is].value == 'moveto' ){
+        targetcontext.beginPath(); // ここではmovetoで前のパスを消すことにする
         targetcontext.moveTo( l + pos[0], t - pos[1] );
         pos = [];
       } else if( drawscript[is].value == 'lineto' ){
@@ -2804,12 +2802,18 @@ function oaedrawscript(){
         pos = [];
       } else if( drawscript[is].value == 'closepath' ){
         targetcontext.closePath();
+      } else if( drawscript[is].value == 'fill' ){
+        targetcontext.fill();
       } else if( drawscript[is].value == 'stroke' ){
         targetcontext.stroke();
-        targetcontext.beginPath();
+      } else if( drawscript[is].value == 'black' ){
+        targetcontext.fillStyle = answershadecolor2;
+      } else if( drawscript[is].value == 'white' ){
+        targetcontext.fillStyle = answershadecolor;
       }
     }
   }
+  targetcontext.restore();
   oae_resetstyle(targetcontext);
 }
 //%}}}
@@ -3347,6 +3351,8 @@ function oae_eval_cmd(str){
     oaepzproutput();
   } else if( str === 'setcellsize' ){
     oaesetcellsize();
+  } else if( str === 'settitle' ){
+    oaesettitle();
   } else if( str === 'setfileloadrc' ){
     oae_setfileloadrc();
   } else if( str === 'drawscriptclean' ){
@@ -3373,7 +3379,7 @@ function oae_eval_cmd(str){
   } else if( str === 'closepath' ){
     let cmd = new Stackobj( 'str', str );
     drawscript.push(cmd);
-  } else if( str === 'stroke' || str === 'fill' ){
+  } else if( str === 'stroke' || str === 'fill' || str === 'black' || str === 'white' || str === 'stars' ){
     let cmd = new Stackobj( 'str', str );
     drawscript.push(cmd);
     oaerewriteall();
@@ -3397,6 +3403,7 @@ function oae_help(){
   str = str + "<br/> saveaspng : PNGとして保存";
   str = str + "<br/> saveaspzpr : ぱずぷれファイルとして保存";
   str = str + "<br/> 48 setcellsize : セルのサイズを指定";
+  str = str + "<br/> \"mypuzzle\" settitle : タイトルを指定";
   str = str + "<br/> \"saveaspng\" setfileloadrc : ファイルロードRCスクリプトの設定";
   str = str + "<br/> debug : デバッグ（開発者用）";
   str = str + "<br/> debughist : デバッグ（開発者用）";
@@ -3441,6 +3448,18 @@ function oaesetcellsize(){
   objectstack.pop();
   cellunit = cs;
   oaerewriteall();
+}
+//%}}}
+// oaesettitle %{{{
+function oaesettitle(){
+  'use strict';
+  if( objectstack.length === 0 ) return;
+  let n = objectstack.length;
+  if( objectstack[n-1].type !== 'str' ) return;
+  //
+  let v = objectstack[n-1].value;
+  document.getElementById('oaeheader').value = v;
+  objectstack.pop();
 }
 //%}}}
 // oae_aviewflip %{{{
