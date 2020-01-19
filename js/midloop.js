@@ -54,6 +54,137 @@ keydown: function (){
 },
 //%}}}
 
+// pzprfileinput %{{{
+pzprfileinput: function () {
+  'use strict';
+  midloop.pzprfileinput_qdatap();
+  midloop.pzprfileinput_adatav();
+  midloop.pzprfileinput_adatah();
+},
+//%}}}
+// pzprfileinput_qdatap %{{{
+pzprfileinput_qdatap: function () {
+  'use strict';
+  for( let iy = 2*ndivy; iy >= 2; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s*/);
+    for( let ix = 2; ix <= 2*ndivx; ix ++ ){
+      qdatap[ix][iy] = words[ix-2];
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+// pzprfileinput_adatav %{{{
+pzprfileinput_adatav: function () {
+  'use strict';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s+/);
+    for( let ix = 1; ix < ndivx; ix ++ ){
+      if( words[ix-1] === '0' ){
+        adatav[ix][iy] = '0';
+      } else if( words[ix-1] === '1' ){
+        adatav[ix][iy] = '-1';
+      } else if( words[ix-1] === '-1' ){
+        adatav[ix][iy] = '1';
+      }
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+// pzprfileinput_adatah %{{{
+pzprfileinput_adatah: function () {
+  'use strict';
+  for( let iy = ndivy-1; iy >= 1; iy -- ){
+    let cline = filebuffer[0].trim();
+    let words = cline.split(/\s+/);
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( words[ix-1] === '0' ){
+        adatah[ix][iy] = '0';
+      } else if( words[ix-1] === '1' ){
+        adatah[ix][iy] = '-1';
+      } else if( words[ix-1] === '-1' ){
+        adatah[ix][iy] = '1';
+      }
+    }
+    filebuffer.shift();
+  }
+  return;
+},
+//%}}}
+
+// pzprfileoutput %{{{
+pzprfileoutput: function () {
+  'use strict';
+  // puzz.link format (Aug. 2019)
+  let str;
+  str = 'pzprv3';
+  str = str + '\n' + puzzletype;
+  str = str + '\n' + ndivy.toString(10);
+  str = str + '\n' + ndivx.toString(10);
+  str = str + '\n';
+  str = str + midloop.pzprfileoutput_qdatap();
+  str = str + midloop.pzprfileoutput_adatav();
+  str = str + midloop.pzprfileoutput_adatah();
+  return str;
+},
+//%}}}
+// pzprfileoutput_qdatap %{{{
+pzprfileoutput_qdatap: function () {
+  'use strict';
+  let str = '';
+  for( let iy = 2*ndivy; iy >= 2; iy -- ){
+    for( let ix = 2; ix <= 2*ndivx; ix ++ ){
+      str = str + qdatap[ix][iy];
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+// pzprfileoutput_adatav %{{{
+pzprfileoutput_adatav: function () {
+  'use strict';
+  let str = '';
+  for( let iy = ndivy; iy >= 1; iy -- ){
+    for( let ix = 1; ix < ndivx; ix ++ ){
+      if( adatav[ix][iy] === '-1' ){
+        str = str + ' 1';
+      } else if( adatav[ix][iy] === '1' ){
+        str = str + ' -1';
+      } else {
+        str = str + ' 0';
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+// pzprfileoutput_adatah %{{{
+pzprfileoutput_adatah: function () {
+  'use strict';
+  let str = '';
+  for( let iy = ndivy-1; iy >= 1; iy -- ){
+    for( let ix = 1; ix <= ndivx; ix ++ ){
+      if( adatah[ix][iy] === '-1' ){
+        str = str + ' 1';
+      } else if( adatah[ix][iy] === '1' ){
+        str = str + ' -1';
+      } else {
+        str = str + ' 0';
+      }
+    }
+    str = str + '\n';
+  }
+  return str;
+},
+//%}}}
+
 // check %{{{
 check: function (){
   'use strict';

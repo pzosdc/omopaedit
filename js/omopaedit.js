@@ -1961,6 +1961,8 @@ function oaepzproutput_base(){
     str = doublechoco.pzprfileoutput();
   } else if( puzzletype === 'pencils' ){
     str = pencils.pzprfileoutput();
+  } else if( puzzletype === 'midloop' ){
+    str = midloop.pzprfileoutput();
   } else {
     return false;
   }
@@ -2146,6 +2148,7 @@ function oaefileinput_base(str){
     } else if( puzzletype === 'squlin' ){ squlin.pzprfileinput();
     } else if( puzzletype === 'doublechoco' ){ doublechoco.pzprfileinput();
     } else if( puzzletype === 'pencils' ){ pencils.pzprfileinput();
+    } else if( puzzletype === 'midloop' ){ midloop.pzprfileinput();
     } else {
       oaeconsolemsg('このパズルはぱずぷれ入力に対応していません');
       return "Error";
