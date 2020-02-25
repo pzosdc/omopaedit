@@ -105,6 +105,7 @@ var doublechoco;
 var tentaisho;
 var midloop;
 var squlin;
+var symlink;
 //%}}}
 
 // onload %{{{
@@ -371,6 +372,8 @@ function oaeinit_puzzle(){
     //midloop.init();
   } else if( puzzletype === 'squlin' ){
     //squlin.init();
+  } else if( puzzletype === 'symlink' ){
+    symlink.init();
   }
 }
 //%}}}
@@ -553,6 +556,15 @@ function oae_reflectpuzzletype(){
     hasadatah = true;
     allowborderwall = true;
     gridtype = 'dotatnode';
+  } else if( puzzletype === 'symlink' ){
+    hasqdatac = true;
+    hasqdatap = false;
+    hasqdatan = false;
+    hasadatac = false;
+    hasadatav = true;
+    hasadatah = true;
+    allowborderwall = false;
+    gridtype = 'dashed';
   }
 }
 //%}}}
@@ -917,6 +929,7 @@ function oae_mousedown(ev){
     dragpath.push([focusx,focusy]);
     if( puzzletype === 'pencils' ){ // ペンシルズのqdatacはmousedownのタイミングでは処理しない（芯入力があるため）
     } else if( puzzletype === 'squlin' ){ // スクリンのqdatacはmousedownのタイミングでは処理しない（表出移動のため）
+    } else if( puzzletype === 'symlink' ){ // シムリンクのqdatacはmousedownのタイミングでは処理しない（矢印入力があるため）
     } else {
       if( button === buttonid.left ){
         oae_leftclick();
@@ -956,6 +969,7 @@ function oae_mousedown(ev){
     if( ! hasadatav && ! hasadatah ) return false;
     // 壁または線の処理
     if( puzzletype === 'midloop' ) button = 2 - button; // 左右入れ替え
+    if( puzzletype === 'symlink' ) button = 2 - button; // 左右入れ替え
     if( button === buttonid.left ){
       // left click -> wall operation
       let idarr = oaegetnodeid(ev,false);
@@ -1038,6 +1052,8 @@ function oae_mousemove_core(){
     midloop.mousemove();
   } else if( puzzletype === 'squlin' ){
     squlin.mousemove();
+  } else if( puzzletype === 'symlink' ){
+    symlink.mousemove();
   }
   return true;
 }
@@ -1116,6 +1132,8 @@ function oae_keydown(ev){
     midloop.keydown(n);
   } else if( puzzletype === 'squlin' ){
     squlin.keydown(n);
+  } else if( puzzletype === 'symlink' ){
+    symlink.keydown(n);
   }
   return true;
 }
@@ -1222,6 +1240,7 @@ function oae_shadetoggle(str){
   } else if( puzzletype === 'midloop' ){
   } else if( puzzletype === 'squlin' ){
     return squlin.shadetoggle(str);
+  } else if( puzzletype === 'symlink' ){
   }
 }
 //%}}}
@@ -1237,6 +1256,7 @@ function oae_unshadetoggle(str){
   } else if( puzzletype === 'midloop' ){
   } else if( puzzletype === 'squlin' ){
     return squlin.unshadetoggle(str);
+  } else if( puzzletype === 'symlink' ){
   }
 }
 //%}}}
@@ -1254,6 +1274,8 @@ function oae_leftclick(){
     midloop.leftclick();
   } else if( puzzletype === 'squlin' ){
     squlin.leftclick();
+  } else if( puzzletype === 'symlink' ){
+    symlink.leftclick();
   }
 }
 //%}}}
@@ -1270,6 +1292,8 @@ function oae_rightclick(){
     midloop.rightclick();
   } else if( puzzletype === 'squlin' ){
     squlin.rightclick();
+  } else if( puzzletype === 'symlink' ){
+    symlink.rightclick();
   }
 }
 //%}}}
@@ -2035,6 +2059,8 @@ function oae_checkandfixpuzzletype(){
     puzzletype = 'midloop';
   } else if( puzzletype === 'squlin' || puzzletype === 'scrin' ){
     puzzletype = 'squlin';
+  } else if( puzzletype === 'symlink' ){
+    puzzletype = 'symlink';
   } else {
     puzzletype = false;
   }
@@ -2910,6 +2936,8 @@ function oaedrawqdata_c(){
         }
       } else if( puzzletype === 'squlin' ){
         oaedrawqdata_c_onum(centx,centy,str,fgcontext);
+      } else if( puzzletype === 'symlink' ){
+        symlink.draw_qdata(centx,centy,str,fgcontext);
       } else {
         // default
         oaedrawqdata_c_num(centx,centy,str,fgcontext);
